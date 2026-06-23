@@ -1,0 +1,139 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SLA: {namespace}/{entity}
+# ═══════════════════════════════════════════════════════════════════════════
+
+version: "1.0.0"
+
+# ───────────────────────────────────────────────────────────────────────────
+# Availability
+# ───────────────────────────────────────────────────────────────────────────
+availability:
+  # Percentage of time data is delivered without interruption
+  target: "99.9%"              # 99.9% | 99.5% | 95%
+
+  # When data is expected to be available
+  schedule:
+    weekdays: "00:00-23:59"
+    weekends: "00:00-23:59"    # change if not 24/7
+
+  # Planned maintenance windows
+  maintenance_windows:
+    - day: "sunday"
+      time: "03:00-04:00"
+      description: "Weekly maintenance"
+
+# ───────────────────────────────────────────────────────────────────────────
+# Freshness
+# ───────────────────────────────────────────────────────────────────────────
+freshness:
+  # Maximum data age (ISO 8601 duration)
+  # PT1H = 1 hour, PT30M = 30 minutes, P1D = 1 day
+  max_age: "PT1H"
+
+  # Field used to measure freshness (must exist in schema.avsc)
+  timestamp_field: "created_at"
+
+  # Alerts
+  alert_threshold: "PT2H"      # warn if older than 2 hours
+  critical_threshold: "PT4H"   # critical if older than 4 hours
+
+# ───────────────────────────────────────────────────────────────────────────
+# Response time
+# ───────────────────────────────────────────────────────────────────────────
+response_time:
+  # Incident response time (ISO 8601 duration)
+  critical: "PT15M"
+  high: "PT1H"
+  medium: "PT4H"
+  low: "P1D"
+
+  # Recovery time (MTTR)
+  recovery_time:
+    target: "PT2H"
+    maximum: "PT4H"
+
+# ───────────────────────────────────────────────────────────────────────────
+# Retention
+# ───────────────────────────────────────────────────────────────────────────
+retention:
+  # Raw data
+  raw:
+    duration: "P7D"
+    reason: "Reprocessing after failures"
+
+  # Prod data
+  prod:
+    duration: "P30D"
+    reason: "Analysis and debugging"
+
+  # Dead-letter queue
+  dlq:
+    duration: "P90D"
+    reason: "Investigating quality issues"
+
+  # Warehouse storage tiers
+  dwh:
+    hot:
+      duration: "P1Y"
+      storage_class: "ssd"
+
+    warm:
+      duration: "P3Y"
+      storage_class: "hdd"
+
+    cold:
+      duration: "P7Y"
+      storage_class: "archive"
+
+  # -------------------------------------------------------------------------
+  # PII deletion (right to erasure)
+  # -------------------------------------------------------------------------
+  # Declarative policy for products that contain personal data. This is a
+  # requirement DPM records for your downstream pipelines to honour — DPM
+  # validates the contract, it does not delete or mask any data itself.
+  pii_deletion:
+    enabled: true
+    # hard_delete   — physically remove from all stores
+    # anonymization — irreversible de-identification (hash/mask)
+    method: "hard_delete"
+    # Deadline to fulfil a subject's erasure request
+    deadline_after_request: "30d"
+
+  # -------------------------------------------------------------------------
+  # Data residency (optional — for jurisdictions that require it)
+  # -------------------------------------------------------------------------
+  # data_residency:
+  #   storage_region: "{region}"
+  #   cross_border_transfer: false
+  #   backup_region: "{region}"
+
+# ───────────────────────────────────────────────────────────────────────────
+# Throughput & volume
+# ───────────────────────────────────────────────────────────────────────────
+throughput:
+  expected:
+    records_per_second: 100
+    peak_records_per_second: 1000
+    daily_volume: 500000
+
+  limits:
+    max_batch_size: 1000
+    max_message_size_kb: 1024
+
+# ───────────────────────────────────────────────────────────────────────────
+# Escalation
+# ───────────────────────────────────────────────────────────────────────────
+escalation:
+  level_1:
+    team: "{your-team}"
+    mattermost: "{your-team-alerts}"
+    email: "{your-team}@example.com"
+
+  level_2:
+    team: "data-platform"
+    mattermost: "data-platform-oncall"
+    email: "data-platform@example.com"
+
+  level_3:
+    team: "engineering-leadership"
+    email: "engineering-leads@example.com"

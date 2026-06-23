@@ -1,0 +1,69 @@
+{
+  "type": "record",
+  "name": "{EntityName}",
+  "namespace": "{namespace}.{entity}",
+  "doc": "{Entity description}",
+  "_pii_annotation_guide": "Annotate every field that holds personal data with the custom properties pii, pii_category and consent_required. These are declarative metadata that downstream systems can use for masking and access control — DPM records and validates them, it does not enforce them. See customer_email below as an example; remove it and replace with your entity's real PII fields.",
+  "fields": [
+    {
+      "name": "{field_id}",
+      "type": "string",
+      "doc": "Unique identifier",
+      "logicalType": "uuid"
+    },
+    {
+      "name": "{field_name}",
+      "type": "string",
+      "doc": "Name/title"
+    },
+    {
+      "name": "{field_amount}",
+      "type": "double",
+      "doc": "Amount/quantity"
+    },
+    {
+      "name": "{field_status}",
+      "type": {
+        "type": "enum",
+        "name": "{EntityName}Status",
+        "symbols": [
+          "active",
+          "inactive",
+          "pending"
+        ]
+      },
+      "doc": "Record status"
+    },
+    {
+      "name": "{nullable_field}",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional field"
+    },
+    {
+      "name": "customer_email",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Customer email (personal data)",
+      "pii": true,
+      "pii_category": "personal_data",
+      "consent_required": true
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Creation timestamp (UTC)"
+    },
+    {
+      "name": "updated_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Last update timestamp (UTC)"
+    }
+  ]
+}

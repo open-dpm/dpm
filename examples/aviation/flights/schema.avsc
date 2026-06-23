@@ -1,0 +1,71 @@
+{
+  "type": "record",
+  "name": "Flight",
+  "namespace": "aviation.flights",
+  "doc": "Aircraft position data from ADS-B/OpenSky Network",
+  "fields": [
+    {
+      "name": "icao24",
+      "type": "string",
+      "doc": "Unique ICAO 24-bit transponder address (hex, lowercase)"
+    },
+    {
+      "name": "callsign",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Aircraft callsign (8 characters)"
+    },
+    {
+      "name": "origin_country",
+      "type": "string",
+      "doc": "Country of aircraft registration"
+    },
+    {
+      "name": "longitude",
+      "type": "double",
+      "doc": "Longitude in degrees (WGS84)"
+    },
+    {
+      "name": "latitude",
+      "type": "double",
+      "doc": "Latitude in degrees (WGS84)"
+    },
+    {
+      "name": "altitude",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Barometric altitude in meters"
+    },
+    {
+      "name": "velocity",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Ground speed in m/s"
+    },
+    {
+      "name": "heading",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Heading in degrees clockwise from north (0-360)"
+    },
+    {
+      "name": "vertical_rate",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Vertical rate in m/s (positive - climbing)"
+    },
+    {
+      "name": "on_ground",
+      "type": "boolean",
+      "doc": "Whether the aircraft is on the ground"
+    },
+    {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Time the data was received (UTC, milliseconds)"
+    }
+  ]
+}

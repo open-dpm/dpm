@@ -1,0 +1,104 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT MANIFEST: aviation/flights
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Versions
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+# ───────────────────────────────────────────────────────────────────────────
+# METADATA
+# ───────────────────────────────────────────────────────────────────────────
+metadata:
+  name: "flights"
+  namespace: "aviation"
+  data_category: "transactional_data"
+  pii: false
+  display_name: "Aircraft Flight Data"
+  description: |
+    Real-time aircraft flight data.
+    Source: OpenSky Network API (ADS-B data).
+
+    Contains position, speed, altitude, and other flight parameters
+    for aircraft around the world.
+
+    Use cases:
+    - Air traffic monitoring
+    - Air transport analytics
+    - Flight visualization on a map
+
+  # Data owner
+  owner:
+    team: "data-platform"
+    email: "data-platform@example.com"
+    mattermost: "data-platform"
+    on_call: "https://oncall.example.com/aviation"
+
+  # Related systems
+  systems:
+    producer: "OpenSky Network API"
+
+  # Tags for search and filtering
+  tags:
+    - "aviation"
+    - "realtime"
+    - "demo"
+
+  # Version metadata
+  created_at: "2026-01-28"
+  updated_at: "2026-01-28"
+  created_by: "data-platform@example.com"
+
+# ───────────────────────────────────────────────────────────────────────────
+# REFERENCES TO OTHER CONTRACT FILES
+# ───────────────────────────────────────────────────────────────────────────
+
+# Avro data schema
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+# Business semantics of the data
+semantics:
+  file: "./semantics.yml"
+
+# Data quality rules
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+# SLA and retention policies
+sla:
+  file: "./sla.yml"
+
+# Physical storage layout
+physical_layout:
+  file: "./physical_layout.yml"
+
+# Runbook for operators
+runbook:
+  file: "./runbook.md"
+
+# ───────────────────────────────────────────────────────────────────────────
+# LINEAGE (Data Lineage)
+# ───────────────────────────────────────────────────────────────────────────
+lineage:
+  upstream:
+    - system: "OpenSky Network"
+      api: "https://opensky-network.org/api/states/all"
+      extraction_method: api
+  
+  downstream: []
+
+# ───────────────────────────────────────────────────────────────────────────
+# CHANGELOG (Change history)
+# ───────────────────────────────────────────────────────────────────────────
+changelog:
+  - version: "1.0.0"
+    date: "2026-01-28"
+    author: "data-platform@example.com"
+    changes:
+      - type: "initial"
+        description: "First manifest version for the Starter platform demo"
+    breaking: false
