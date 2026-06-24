@@ -77,9 +77,10 @@ variable:
    - **Protect variable** — leave **off**. If protected, the variable is absent in
      merge-request and feature-branch pipelines (where validation runs) and `pip install` would
      get an empty value.
-   - **Expand variable reference** — leave at its default; the value has no `$`, so it has no
-     effect.
-5. Save.
+   - **Expand variable reference** — leave **unticked**; the value has no `$`, so it makes no
+     difference either way.
+
+   In short: **tick neither flag**, then Save.
 
 > If you really want a maskable value, use the bare URL form without spaces —
 > `git+https://gitlab.example.com/data/dpm.git@v0.2.0` — `pip install` accepts it just as well.
