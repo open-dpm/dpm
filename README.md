@@ -1,10 +1,47 @@
 # DPM — Data Product Manifest
 
-**DPM** — open source toolkit for describing, validating and governing **data products as code**.
+**DPM** is an open-source toolkit that treats **data products as code**: their schema, semantics, quality rules, SLA, ownership and lineage live as versioned files in Git and are validated in CI on every change.
 
-A Data Product Manifest (DPM) is a machine-readable definition of a data product: schema, SLA, quality rules, ownership, lineage, governance metadata and operational runbook — stored as versioned files in Git.
+## Why DPM?
 
-> Not another generic "data contracts" repo. DPM focuses on the full **data product** lifecycle, not just schema.
+A producer renames a column or drops a field. Overnight three dashboards and an ML pipeline break — and nobody was warned. Most data products have no contract, no versioning and no review: their meaning, ownership, SLA and quality live as tribal knowledge.
+
+DPM turns each data product into a **versioned contract** reviewed like code.
+
+## A breaking change — with and without DPM
+
+Say a producer removes the `email` field (or changes `amount` from `int` to `string`):
+
+- **Without DPM** — the merge goes in, the new schema ships, and consumers find out in production when their dashboards and jobs break.
+- **With DPM** — the change is a merge request, and DPM catches the breaking schema change in CI, so the pipeline turns red. A breaking change is never merged in place: the producer publishes a new MAJOR version of the manifest **alongside** the current one and marks the old one `deprecated` (its `status` plus the `deprecation` section), giving consumers a migration window before it is retired.
+
+## How it works
+
+Every change to a data product goes through a merge request where DPM, in CI:
+
+- checks the manifest is complete and well-formed (schema, metadata, ownership);
+- validates the quality rules and governance requirements;
+- detects **breaking schema changes** and enforces the matching SemVer bump.
+
+```mermaid
+flowchart TD
+    P["Producer changes a data product"] --> MR["Merge Request"]
+    MR --> CI{"DPM checks in CI"}
+    CI -->|"invalid or incomplete"| RED["Pipeline blocked — fix and retry"]
+    CI -->|"backward-compatible (MINOR / PATCH)"| OK["Merge — consumers unaffected"]
+    CI -->|"breaking change"| BR["Publish a new MAJOR version<br/>alongside the old one;<br/>mark the old one deprecated"]
+    BR --> DEP["Consumers migrate during<br/>the deprecation window"]
+    DEP --> RET["Old version retired"]
+```
+
+> Not another generic "data contracts" repo — DPM covers the full **data product** lifecycle, not just schema.
+
+## Security and privacy
+
+Privacy and access are part of the manifest, not an afterthought:
+
+- **Per-field PII flags.** Every schema field can be marked `pii: true`. DPM checks that the product's `metadata.pii` flag stays consistent with the fields marked PII in the schema — a mismatch fails the pipeline — so the privacy picture can't silently drift and is reviewed in the same merge request as the schema.
+- **Access posture in the manifest.** The manifest documents how data is produced and accessed — for example, ingestion over **mTLS with certificate CN pinning** at your API gateway, so the right producer writes to the right place. DPM versions and reviews these declarations; enforcing them at runtime is your platform's job.
 
 ## Quickstart
 
@@ -83,8 +120,6 @@ A "data contract" — as captured by the [Open Data Contract Standard (ODCS)](ht
 | Business semantics | — | `semantics.yml` |
 | Physical layout | — | `physical_layout.yml` |
 | Operational runbook | — | `runbook.md` |
-
-DPM uses its own multi-file Avro + YAML format and is **not** ODCS-compatible today. ODCS import/export is on the roadmap so DPM manifests can interoperate with the wider data-contract ecosystem.
 
 ## License
 
