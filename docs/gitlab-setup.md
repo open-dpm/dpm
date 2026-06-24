@@ -71,7 +71,18 @@ variable:
 2. **Key:** `DPM_PKG`
 3. **Value:** `dpm @ git+https://gitlab.example.com/data/dpm.git@v0.2.0`
    (use the current tag; update it when you move to a new version)
-4. Untick **Protected** (so it works on all branches), save.
+4. Flags:
+   - **Mask variable** — leave **off**. Masking forbids whitespace, and this value contains
+     spaces (`dpm @ git+...`); it is not a secret, so there is nothing to mask.
+   - **Protect variable** — leave **off**. If protected, the variable is absent in
+     merge-request and feature-branch pipelines (where validation runs) and `pip install` would
+     get an empty value.
+   - **Expand variable reference** — leave at its default; the value has no `$`, so it has no
+     effect.
+5. Save.
+
+> If you really want a maskable value, use the bare URL form without spaces —
+> `git+https://gitlab.example.com/data/dpm.git@v0.2.0` — `pip install` accepts it just as well.
 
 Every domain inside the `data` group that includes our CI template will now install the tool
 from your GitLab automatically.
