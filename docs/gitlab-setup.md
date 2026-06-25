@@ -30,22 +30,28 @@ GitLab copies the whole repository, branches and tags. It is now available at
 When a new DPM release appears on GitHub (e.g. `v0.3.0`), bring it into GitLab. Run this from
 any machine with `git` installed.
 
-**Set up once** (a local working copy that acts as a bridge):
+**Set up once** — clone *your* GitLab repo and add GitHub as the upstream source:
 ```bash
-git clone https://github.com/open-dpm/dpm.git
+git clone https://gitlab.example.com/data/dpm.git
 cd dpm
-git remote add gitlab https://gitlab.example.com/data/dpm.git
+git remote add upstream https://github.com/open-dpm/dpm.git
 ```
-What this means: your local repo now has two remotes (named addresses) — `origin` = GitHub
-(where you pull from), `gitlab` = your GitLab (where you push to). The names are arbitrary labels.
+What this means: your local repo now has two remotes (named addresses) — `origin` = your GitLab
+(where you push to, because you cloned it), `upstream` = GitHub (where you pull from). The names
+are arbitrary labels.
 
 **Each time a new version is out:**
 ```bash
-git fetch origin --tags --prune     # get the latest code and tags from GitHub
-git push gitlab main --tags         # push them to your GitLab
+git pull --ff-only upstream main --tags   # update local main from GitHub, and fetch its tags
+git push origin main --tags               # push them to your GitLab
 ```
 
 That's it — `data/dpm` now has the new commits and tags.
+
+> Use `pull`, not `fetch`: `fetch` would update only the remote-tracking ref and leave your local
+> `main` behind, so `push` would send nothing new. `--ff-only` keeps it a clean fast-forward — if
+> someone accidentally committed to the mirror it fails loudly instead of making a merge mess (the
+> mirror should only ever receive commits from upstream).
 
 ---
 
@@ -120,6 +126,6 @@ changes: the CI template uses the image when `DPM_IMAGE` is set and skips `pip i
 ## Cheat sheet
 
 - First time: **Import by URL** → `data/dpm`.
-- Update: `git fetch origin --tags` → `git push gitlab main --tags`.
+- Update: `git pull --ff-only upstream main --tags` → `git push origin main --tags`.
 - Versioning for domains: a GitLab Release from the tag + the `DPM_PKG` group variable.
 - Faster CI: build/pull a DPM image and set the `DPM_IMAGE` group variable (skips `pip install`).
