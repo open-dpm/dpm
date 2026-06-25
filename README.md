@@ -1,5 +1,11 @@
 # DPM — Data Product Manifest
 
+[![CI](https://github.com/open-dpm/dpm/actions/workflows/ci.yml/badge.svg)](https://github.com/open-dpm/dpm/actions/workflows/ci.yml)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
+[![Release](https://img.shields.io/github/v/release/open-dpm/dpm)](https://github.com/open-dpm/dpm/releases)
+[![Telegram](https://img.shields.io/badge/Telegram-chat-26A5E4?logo=telegram&logoColor=white)](https://t.me/opendpm)
+
 **DPM** is an open-source toolkit that treats **data products as code**: their schema, semantics, quality rules, SLA, ownership and lineage live as versioned files in Git and are validated in CI on every change.
 
 ## Why DPM?
