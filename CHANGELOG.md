@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.0] - 2026-06-25
+
+### Added
+
+- Official Docker image published to GHCR (`ghcr.io/open-dpm/dpm`); the GitLab CI template can use it via `DPM_IMAGE` to skip `pip install` on every run
+- Optional `build:image` job (kaniko) to build the image into your own GitLab Container Registry
+- Status badges in the README (CI, license, Python, release, Telegram)
+
+### Changed
+
+- README rewritten problem-first, with a merge-request-gate flow diagram and a security/privacy section
+- GitLab setup guide: clearer `DPM_PKG` variable instructions and a section on faster CI with a prebuilt image
+
 ## [0.1.0] - 2026-06-23
 
 Initial public release.
