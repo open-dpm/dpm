@@ -90,8 +90,36 @@ from your GitLab automatically.
 
 ---
 
+## Part 5. Faster CI with a prebuilt image (optional)
+
+Installing DPM with `pip` on every pipeline is fine for a few repositories. With many domains and
+frequent merge requests it adds up. A **prebuilt image** that already contains DPM removes the
+install step entirely — the job just pulls the image and runs `dpm`.
+
+Pick one of:
+
+- **Public image (simplest).** Set a group-level variable `DPM_IMAGE = ghcr.io/open-dpm/dpm:v0.1.0`.
+- **Your own image (recommended inside the company).** Tag your `data/dpm` mirror (e.g. `v0.1.0`);
+  the `build:image` job in its `.gitlab-ci.yml` builds the `Dockerfile` and pushes it to your GitLab
+  Container Registry (`registry.gitlab.example.com/data/dpm:v0.1.0`). Then set the group variable
+  `DPM_IMAGE = registry.gitlab.example.com/data/dpm:0.1.0`.
+
+Set `DPM_IMAGE` with the same flags as `DPM_PKG` — **Mask off, Protect off**. Domains need no
+changes: the CI template uses the image when `DPM_IMAGE` is set and skips `pip install`.
+
+> The image is built with **kaniko** — no Docker daemon and no privileged mode — so it runs on
+> locked-down shared runners where docker-in-docker is forbidden.
+>
+> Two adjustments for restricted setups: if your runners cannot reach `gcr.io`, set
+> `KANIKO_IMAGE` to a mirror of kaniko (in Harbor or your GitLab); if you push to **Harbor**
+> instead of the GitLab registry, change the `--destination` in `build:image` and supply Harbor's
+> credentials.
+
+---
+
 ## Cheat sheet
 
 - First time: **Import by URL** → `data/dpm`.
 - Update: `git fetch origin --tags` → `git push gitlab main --tags`.
 - Versioning for domains: a GitLab Release from the tag + the `DPM_PKG` group variable.
+- Faster CI: build/pull a DPM image and set the `DPM_IMAGE` group variable (skips `pip install`).

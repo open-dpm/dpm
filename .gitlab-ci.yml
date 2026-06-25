@@ -4,15 +4,20 @@ stages:
   - validate
   - analyze
   - version
+  - build
 
 variables:
   PYTHON_VERSION: "3.12"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  # kaniko builder image (the tool that builds the DPM image). Default is its public home;
+  # override to a mirror (Harbor / your GitLab) if runners cannot reach gcr.io.
+  KANIKO_IMAGE: "gcr.io/kaniko-project/executor:debug"
 
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_TAG'
     - when: never
 
 .python_base:
@@ -123,3 +128,26 @@ version:suggest:
       - suggested_versions.json
     expire_in: 1 day
   allow_failure: true
+
+# Optional: build a prebuilt DPM image into this GitLab's Container Registry on tag pipelines.
+# Domains then set DPM_IMAGE to it to skip pip install in CI. Uses kaniko — no Docker daemon and
+# no privileged mode, so it runs on locked-down shared runners.
+# For a different target registry (e.g. Harbor), change --destination and supply its credentials.
+build:image:
+  stage: build
+  image:
+    name: "$KANIKO_IMAGE"
+    entrypoint: [""]
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  script:
+    - mkdir -p /kaniko/.docker
+    - |
+      AUTH=$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')
+      printf '{"auths":{"%s":{"auth":"%s"}}}' "$CI_REGISTRY" "$AUTH" > /kaniko/.docker/config.json
+    - |
+      /kaniko/executor \
+        --context "$CI_PROJECT_DIR" \
+        --dockerfile "$CI_PROJECT_DIR/Dockerfile" \
+        --destination "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG" \
+        --destination "$CI_REGISTRY_IMAGE:latest"

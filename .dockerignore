@@ -1,0 +1,13 @@
+.git
+.venv
+venv
+dist
+build
+*.egg-info
+.pytest_cache
+.coverage
+htmlcov
+.github
+tests
+docs
+examples
