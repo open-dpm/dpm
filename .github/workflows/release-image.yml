@@ -1,9 +1,17 @@
 name: Release image
 
 on:
+  push:
+    tags: ["v*"]
   release:
     types: [published]
   workflow_dispatch:
+
+# A tag push and the release "published" event can both fire for the same tag;
+# this keeps only one build per ref instead of two identical ones.
+concurrency:
+  group: release-image-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
