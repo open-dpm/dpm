@@ -96,6 +96,9 @@ change cannot be merged while the checks are red. Recommended, not required.
 | `version … does not match SemVer` | version is not like `1.0.0` | fix `manifest_version` |
 | `Breaking changes require MAJOR version bump` | a breaking change (field removed/renamed/retyped) | bump MAJOR **and** follow the deprecation process — see Step 7 |
 | `changelog …` | no changelog entry | add an entry to the manifest's `changelog` |
+| `conformance_missing_attribute` | a canonical entity you declared requires an attribute your schema lacks | add the field, or map it with `rename` (see Step 9) |
+| `conformance_type_mismatch` / `conformance_nullable_attribute` | the field exists but its type is incompatible or nullable for a mandatory attribute | fix the field type / make it non-nullable |
+| `conforms_to_unresolved_version` | the entity version you pinned was retired (sunset) | migrate to the current major of that entity |
 | `No manifests found` | manifests are not under `manifests/` | move them into `manifests/<entity>/` |
 
 ---
@@ -139,10 +142,31 @@ work, you don't invent it.
    migrated.** They were notified and given the window; non-critical consumers do not extend
    the deadline.
 
+## Step 9. (Optional) Declare conformance to a canonical model
+
+If your product **publishes a shared business entity** (its rows *are* customers, accounts,
+aircraft observations, …), the data-architecture team may define that entity in a central
+**canonical registry**, and your product should conform to it. Declare it in the manifest:
+
+```yaml
+metadata:
+  conforms_to:
+    - entity: "aircraft_observation@1"   # pin the MAJOR version only
+      rename:
+        observed_at: "timestamp"          # only where your field name differs
+```
+
+The check then requires your schema to carry every **mandatory** attribute of that entity,
+with a compatible, non-nullable type. A product that only *references* an entity by id (e.g.
+an `orders` table with a `customer_id`) does **not** conform — its rows are orders, not
+customers, so leave `conforms_to` out. Full workflow (defining entities, evolving them,
+sunset): `data/dpm` → `docs/canonical-model.md`.
+
 ## If you get stuck
 
 - A reference to copy from: `data/dpm` → `examples/aviation/flights/`.
 - What is checked and why: `data/dpm` → `docs/DATA_GOVERNANCE_SPEC.md`.
+- Connecting to a canonical model: `data/dpm` → `docs/canonical-model.md`.
 
 ## One-line summary
 

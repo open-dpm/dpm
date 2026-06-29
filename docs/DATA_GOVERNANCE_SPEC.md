@@ -31,8 +31,9 @@ approvals.
 
 Each product lives in its own directory with these files:
 
-- `manifest.yaml` — index: `spec_version`, `manifest_version`, `status`, `metadata`,
-  references to the files below, `lineage`, `changelog`.
+- `manifest.yaml` — index: `kind` (`data_product`, default, or `canonical_entity`),
+  `spec_version`, `manifest_version`, `status`, `metadata`, references to the files below,
+  `lineage`, `changelog`.
 - `schema.avsc` — Avro schema (the source of truth for fields).
 - `semantics.yml`, `quality_rules.yml`, `sla.yml`, `physical_layout.yml`, `runbook.md`.
 - `CODEOWNERS` — reviewers for the directory.
@@ -72,6 +73,19 @@ Validators emit findings at one of three severities: **error** (blocks merge),
 ### Critical products
 Products tagged `critical` or `tier-1` additionally require an `on_call` link, a
 `runbook.md` and at least one declared downstream consumer.
+
+### Canonical model conformance (EDM)
+A product may opt in to the Enterprise Data Model by declaring the canonical entities it
+represents (`metadata.conforms_to: [{entity: "name@MAJOR", rename: {...}}]`). For each one,
+`dpm validate-conformance` resolves the entity from the canonical registry and requires the
+product schema to carry every **mandatory** canonical attribute (the entity's non-nullable
+fields), under its physical name, with a compatible, non-nullable type
+(`conformance_missing_attribute`, `conformance_type_mismatch`, `conformance_nullable_attribute`).
+A product without `conforms_to` is outside the EDM and is not checked. Canonical entities
+themselves are manifests with `kind: canonical_entity` — definitions without rows, so the SLA,
+quality-rules, lineage and PII rules above do not apply to them. This is conformance to a shared
+entity model (DMBOK Enterprise Data Model), distinct from the referential-integrity `reference`
+quality rule. Full workflow: [canonical-model.md](canonical-model.md).
 
 ## Data quality dimensions
 

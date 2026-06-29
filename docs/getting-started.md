@@ -21,3 +21,15 @@ dpm governance --all
 2. Rename and fill `manifest-template.yaml` → `manifest.yaml`
 3. Set `manifest_version` (SemVer)
 4. Run `dpm validate` before commit
+
+## Conform to a canonical model (EDM)
+
+If a product publishes a shared business entity, declare it with
+`metadata.conforms_to` and check it against the canonical registry:
+
+```bash
+dpm validate-conformance --all --registry-path examples/canonical
+dpm conformance-impact --entity aircraft_observation --version 1
+```
+
+See [canonical-model.md](canonical-model.md) for the full workflow.
