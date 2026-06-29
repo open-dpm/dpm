@@ -27,13 +27,14 @@ Every change to a data product goes through a merge request where DPM, in CI:
 
 - checks the manifest is complete and well-formed (schema, metadata, ownership);
 - validates the quality rules and governance requirements;
-- detects **breaking schema changes** and enforces the matching SemVer bump.
+- detects **breaking schema changes** and enforces the matching SemVer bump;
+- when a product opts in via `conforms_to`, checks it **conforms to the canonical / enterprise data model** (carries every mandatory attribute of the declared entity).
 
 ```mermaid
 flowchart TD
     P["Producer changes a data product"] --> MR["Merge Request"]
     MR --> CI{"DPM checks in CI"}
-    CI -->|"invalid or incomplete"| RED["Pipeline blocked — fix and retry"]
+    CI -->|"invalid, incomplete, or non-conformant"| RED["Pipeline blocked — fix and retry"]
     CI -->|"backward-compatible (MINOR / PATCH)"| OK["Merge — consumers unaffected"]
     CI -->|"breaking change"| BR["Publish a new MAJOR version<br/>alongside the old one;<br/>mark the old one deprecated"]
     BR --> DEP["Consumers migrate during<br/>the deprecation window"]
@@ -48,6 +49,19 @@ Privacy and access are part of the manifest, not an afterthought:
 
 - **Per-field PII flags.** Every schema field can be marked `pii: true`. DPM checks that the product's `metadata.pii` flag stays consistent with the fields marked PII in the schema — a mismatch fails the pipeline — so the privacy picture can't silently drift and is reviewed in the same merge request as the schema.
 - **Access posture in the manifest.** The manifest documents how data is produced and accessed — for example, ingestion over **mTLS with certificate CN pinning** at your API gateway, so the right producer writes to the right place. DPM versions and reviews these declarations; enforcing them at runtime is your platform's job.
+
+## Conformance to a canonical model (EDM)
+
+Beyond each product's own contract, DPM can tie products to a shared **Enterprise Data Model**: a central, versioned registry defines each business entity (Customer, Account, …) and its mandatory attributes. A data product that *publishes* such an entity opts in:
+
+```yaml
+metadata:
+  conforms_to:
+    - entity: "aircraft_observation@1"     # pin the MAJOR version
+      rename: { observed_at: "timestamp" }  # only where field names differ
+```
+
+CI then fails if the product's schema is missing a mandatory canonical attribute, or its type is incompatible or nullable. A product without `conforms_to` is outside the EDM and is not checked. This is conformance to a shared entity model (the DMBOK Enterprise Data Model) — distinct from foreign keys between rows. See [docs/canonical-model.md](docs/canonical-model.md).
 
 ## Quickstart
 
@@ -129,6 +143,7 @@ A "data contract" — as captured by the [Open Data Contract Standard (ODCS)](ht
 | Business semantics | — | `semantics.yml` |
 | Physical layout | — | `physical_layout.yml` |
 | Operational runbook | — | `runbook.md` |
+| Canonical / enterprise model conformance | — | `conforms_to` + `dpm validate-conformance` |
 
 ## License
 
