@@ -1,0 +1,153 @@
+# GitLab CI for DPM — Data Product Manifest validation
+stages:
+  - test
+  - validate
+  - analyze
+  - version
+  - build
+
+variables:
+  PYTHON_VERSION: "3.12"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  # kaniko builder image (the tool that builds the DPM image). Default is its public home;
+  # override to a mirror (Harbor / your GitLab) if runners cannot reach gcr.io.
+  KANIKO_IMAGE: "gcr.io/kaniko-project/executor:debug"
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_TAG'
+    - when: never
+
+.python_base:
+  image: python:${PYTHON_VERSION}-slim
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .cache/pip
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git jq > /dev/null 2>&1
+    - pip install --quiet -e ".[dev]"
+
+.only_manifests:
+  rules:
+    - changes:
+        - "examples/**/*.yaml"
+        - "examples/**/*.yml"
+        - "examples/**/*.avsc"
+
+.on_merge_request:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "examples/**/*.yaml"
+        - "examples/**/*.yml"
+        - "examples/**/*.avsc"
+
+test:unit:
+  extends: .python_base
+  stage: test
+  script:
+    - pytest tests/ -v --tb=short
+  rules:
+    - changes:
+        - "src/**/*.py"
+        - "tests/**/*"
+        - "pyproject.toml"
+
+validate:manifest:
+  extends:
+    - .python_base
+    - .only_manifests
+  stage: validate
+  script:
+    - dpm validate --all
+
+validate:quality-rules:
+  extends:
+    - .python_base
+    - .only_manifests
+  stage: validate
+  script:
+    - dpm validate-rules --all
+
+validate:governance:
+  extends:
+    - .python_base
+    - .only_manifests
+  stage: validate
+  script:
+    - dpm governance --all
+
+# Opt-in CODEOWNERS approval gate. Leave off if your platform already enforces
+# approvals (count and required approvers). Enable with DPM_ENFORCE_CODEOWNERS=true.
+validate:codeowners:
+  extends: .python_base
+  stage: validate
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $DPM_ENFORCE_CODEOWNERS == "true"'
+  script:
+    - git fetch origin ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --depth=50
+    - |
+      python -m dpm.codeowners.check_mr_approvals \
+        --base-ref "origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" \
+        --head-ref HEAD
+
+analyze:breaking-changes:
+  extends:
+    - .python_base
+    - .on_merge_request
+  stage: analyze
+  script:
+    - git fetch origin ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --depth=20
+    - |
+      dpm breaking-changes \
+        --base-ref origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} \
+        --head-ref HEAD \
+        --output breaking_changes_report.json
+  artifacts:
+    paths:
+      - breaking_changes_report.json
+    expire_in: 1 week
+
+version:suggest:
+  extends:
+    - .python_base
+    - .on_merge_request
+  stage: version
+  needs:
+    - analyze:breaking-changes
+  script:
+    - |
+      dpm suggest-version \
+        --breaking-changes-file breaking_changes_report.json \
+        --output suggested_versions.json
+  artifacts:
+    paths:
+      - suggested_versions.json
+    expire_in: 1 day
+  allow_failure: true
+
+# Optional: build a prebuilt DPM image into this GitLab's Container Registry on tag pipelines.
+# Domains then set DPM_IMAGE to it to skip pip install in CI. Uses kaniko — no Docker daemon and
+# no privileged mode, so it runs on locked-down shared runners.
+# For a different target registry (e.g. Harbor), change --destination and supply its credentials.
+build:image:
+  stage: build
+  image:
+    name: "$KANIKO_IMAGE"
+    entrypoint: [""]
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  script:
+    - mkdir -p /kaniko/.docker
+    - |
+      AUTH=$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')
+      printf '{"auths":{"%s":{"auth":"%s"}}}' "$CI_REGISTRY" "$AUTH" > /kaniko/.docker/config.json
+    - |
+      /kaniko/executor \
+        --context "$CI_PROJECT_DIR" \
+        --dockerfile "$CI_PROJECT_DIR/Dockerfile" \
+        --destination "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG" \
+        --destination "$CI_REGISTRY_IMAGE:latest"

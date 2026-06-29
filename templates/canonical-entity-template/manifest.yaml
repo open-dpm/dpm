@@ -1,0 +1,63 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CANONICAL ENTITY TEMPLATE
+# ═══════════════════════════════════════════════════════════════════════════
+# A canonical entity is the enterprise-level definition of a business concept
+# (Customer, Account, Order, ...). It is a definition WITHOUT rows — not a data
+# product. Data products declare conformance to it via `metadata.conforms_to`.
+#
+# Place each major version in its own directory so live majors coexist during
+# migration:
+#   canonical/<entity>/v1/{manifest.yaml,schema.avsc}
+#   canonical/<entity>/v2/{manifest.yaml,schema.avsc}
+#
+# Mandatory attributes are the NON-NULLABLE fields of schema.avsc. Adding an
+# optional (nullable) attribute is a MINOR bump; adding a mandatory attribute
+# is a breaking MAJOR bump (create a new vN/ directory, deprecate the old one
+# with a sunset_date, and let conformers migrate within the window).
+
+kind: "canonical_entity"
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"        # entity version; its MAJOR matches the vN/ directory
+status: "active"                 # draft | active | deprecated | retired
+
+metadata:
+  name: "{entity_name}"          # snake_case, e.g. "customer"
+  namespace: "{domain}"          # snake_case owning domain, e.g. "party"
+  display_name: "{Human Name}"
+  description: |
+    {What this business entity is, in enterprise terms. Describe the concept,
+    not a specific dataset.}
+
+  owner:
+    team: "{data-architecture-team}"
+    email: "{team}@example.com"
+    mattermost: "{team-channel}"
+
+  tags:
+    - "canonical"
+
+  created_at: "{YYYY-MM-DD}"
+  updated_at: "{YYYY-MM-DD}"
+  created_by: "{author}@example.com"
+
+# The schema declares the canonical attributes. Non-nullable = mandatory.
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+# Deprecation block — fill in when this major version is superseded.
+# deprecation:
+#   deprecated_at: "{YYYY-MM-DD}"
+#   sunset_date: "{YYYY-MM-DD}"   # after this date the vN/ directory is removed
+#   successor: "{entity_name}@2"
+#   migration_guide: "./MIGRATION.md"
+
+changelog:
+  - version: "1.0.0"
+    date: "{YYYY-MM-DD}"
+    author: "{author}@example.com"
+    changes:
+      - type: "initial"
+        description: "First canonical definition of the entity"
+    breaking: false

@@ -1,0 +1,207 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# QUALITY RULES TEMPLATE
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# This file defines data quality checks. Every record is validated against
+# these rules.
+#
+# Severity levels:
+#   - error:   record is sent to the DLQ (dead-letter queue)
+#   - warning: record passes, but a warning is logged
+#   - info:    metrics only, no logging
+#
+# ═══════════════════════════════════════════════════════════════════════════
+
+version: "1.0"
+
+rules:
+  # ═══════════════════════════════════════════════════════════════════════
+  # NOT NULL CHECKS
+  # Required fields
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "id_not_null"
+    field: "id"
+    type: "not_null"
+    severity: "error"
+    message: "ID is required and cannot be null"
+
+  - name: "created_at_not_null"
+    field: "created_at"
+    type: "not_null"
+    severity: "error"
+    message: "Created timestamp is required"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # RANGE CHECKS
+  # Numeric ranges
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "amount_positive"
+    field: "amount"
+    type: "range"
+    min: 0
+    severity: "error"
+    message: "Amount must be non-negative"
+
+  - name: "quantity_valid"
+    field: "quantity"
+    type: "range"
+    min: 1
+    max: 10000
+    severity: "error"
+    message: "Quantity must be between 1 and 10000"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # ENUM CHECKS
+  # Allowed values
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "status_valid"
+    field: "status"
+    type: "enum"
+    values:
+      - "active"
+      - "inactive"
+      - "deleted"
+    severity: "error"
+    message: "Status must be one of: active, inactive, deleted"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # REGEX CHECKS
+  # Format validation via regular expressions
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "email_format"
+    field: "email"
+    type: "regex"
+    pattern: "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"
+    severity: "warning"    # do not block, just log
+    message: "Email has invalid format"
+
+  - name: "phone_format"
+    field: "phone"
+    type: "regex"
+    pattern: "^\\+[1-9][0-9]{7,14}$"
+    severity: "warning"
+    message: "Phone should be in E.164 format, e.g. +14155552671"
+
+  - name: "id_format"
+    field: "id"
+    type: "regex"
+    pattern: "^[a-z0-9]{8,36}$"
+    severity: "error"
+    message: "ID must be 8-36 lowercase alphanumeric characters"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # FORMAT CHECKS
+  # Standard formats
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "url_format"
+    field: "website_url"
+    type: "format"
+    format: "uri"
+    severity: "warning"
+    message: "Website URL has invalid format"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # FRESHNESS CHECKS
+  # Data freshness
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "data_freshness"
+    field: "created_at"
+    type: "freshness"
+    max_age_minutes: 60    # data no older than 1 hour
+    severity: "error"
+    message: "Data is older than 1 hour"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # UNIQUENESS CHECKS (for batch processing)
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "id_unique_in_batch"
+    field: "id"
+    type: "unique"
+    severity: "error"
+    message: "Duplicate ID found in batch"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # CUSTOM CHECKS
+  # Custom checks with expressions
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "discount_not_exceed_amount"
+    field: "discount"
+    type: "custom"
+    expression: "discount <= amount"
+    severity: "error"
+    message: "Discount cannot exceed total amount"
+
+  - name: "end_date_after_start"
+    field: "end_date"
+    type: "custom"
+    expression: "end_date >= start_date"
+    severity: "error"
+    message: "End date must be after or equal to start date"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # REFERENCE CHECKS (referential integrity)
+  # ═══════════════════════════════════════════════════════════════════════
+
+  # - name: "customer_exists"
+  #   field: "customer_id"
+  #   type: "reference"
+  #   reference_topic: "crm.customers_prod"
+  #   reference_field: "id"
+  #   severity: "warning"
+  #   message: "Referenced customer not found"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # SQL CHECKS (for batch/warehouse checks)
+  # ═══════════════════════════════════════════════════════════════════════
+
+  # - name: "no_future_dates"
+  #   type: "sql"
+  #   expression: "SELECT COUNT(*) FROM __batch__ WHERE created_at > NOW()"
+  #   expected: 0
+  #   severity: "error"
+  #   message: "Found records with future dates"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # PII PROTECTION CHECKS
+  # Personal-data protection rules
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "email_pii_masked"
+    field: "email"
+    type: "regex"
+    pattern: "^\\*{3,}@.*$|^[a-f0-9]{64}$"
+    severity: "error"
+    message: "Email must be masked or hashed, plain-text PII is not allowed"
+
+  - name: "email_consent_metadata"
+    field: "email"
+    type: "custom"
+    expression: "email is null or consent_metadata is not null"
+    severity: "error"
+    message: "consent_metadata is required when email is present"
+
+  - name: "pii_retention_check"
+    type: "sql"
+    query: "SELECT COUNT(*) FROM __batch__ WHERE email IS NOT NULL AND created_at < NOW() - INTERVAL '30 days'"
+    expected: 0
+    severity: "error"
+    message: "PII data exceeds the retention period"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # COMPLETENESS CHECKS (batch-level)
+  # ═══════════════════════════════════════════════════════════════════════
+
+  - name: "email_completeness"
+    field: "email"
+    type: "completeness"
+    min_rate: 0.8
+    severity: "warning"
+    message: "Less than 80% of records have email filled"

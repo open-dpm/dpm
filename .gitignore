@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Local notes (not published)
+PHASES.local.md
+
+# CI artifacts
+*.log
+breaking_changes_report.json
+impact_report.json
+suggested_versions.json

@@ -1,0 +1,96 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SLA: aviation/flights
+# ═══════════════════════════════════════════════════════════════════════════
+# The manifest version is specified in manifest.yaml, not duplicated here
+
+# ───────────────────────────────────────────────────────────────────────────
+# AVAILABILITY
+# ───────────────────────────────────────────────────────────────────────────
+availability:
+  target: "99.0%"
+
+  schedule:
+    weekdays: "00:00-23:59"
+    weekends: "00:00-23:59"
+
+  maintenance_windows:
+    - day: "sunday"
+      time: "02:00-04:00"
+      description: "Weekly maintenance"
+
+# ───────────────────────────────────────────────────────────────────────────
+# DATA FRESHNESS
+# ───────────────────────────────────────────────────────────────────────────
+freshness:
+  max_age: "PT1M"
+  timestamp_field: "timestamp"
+  alert_threshold: "PT30S"
+  critical_threshold: "PT2M"
+
+# ───────────────────────────────────────────────────────────────────────────
+# RESPONSE TIME
+# ───────────────────────────────────────────────────────────────────────────
+response_time:
+  critical: "PT15M"
+  high: "PT1H"
+  medium: "PT4H"
+  low: "P1D"
+
+  recovery_time:
+    target: "PT2H"
+    maximum: "PT4H"
+
+# ───────────────────────────────────────────────────────────────────────────
+# RETENTION (Data retention)
+# ───────────────────────────────────────────────────────────────────────────
+retention:
+  raw:
+    duration: "P1D"
+    reason: "For reprocessing on failures"
+
+  prod:
+    duration: "P1D"
+    reason: "Real-time data, short retention"
+
+  dlq:
+    duration: "P7D"
+    reason: "For investigating quality issues"
+
+# ───────────────────────────────────────────────────────────────────────────
+# QUALITY SLA
+# ───────────────────────────────────────────────────────────────────────────
+quality:
+  max_dlq_rate_percent: 5.0
+  alert_dlq_rate_percent: 2.0
+
+# ───────────────────────────────────────────────────────────────────────────
+# THROUGHPUT & VOLUME
+# ───────────────────────────────────────────────────────────────────────────
+throughput:
+  expected:
+    records_per_second: 17
+    peak_records_per_second: 100
+    daily_volume: 1440000
+
+  limits:
+    max_batch_size: 1000
+    max_message_size_kb: 512
+
+# ───────────────────────────────────────────────────────────────────────────
+# ESCALATION
+# ───────────────────────────────────────────────────────────────────────────
+escalation:
+  level_1:
+    team: "data-platform"
+    mattermost: "data-platform"
+    email: "data-platform@example.com"
+
+  level_2:
+    team: "data-platform"
+    mattermost: "data-platform-oncall"
+    email: "data-platform@example.com"
+    oncall: "https://oncall.example.com/aviation"
+
+  level_3:
+    team: "engineering-leadership"
+    email: "engineering-leads@example.com"

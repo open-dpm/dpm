@@ -1,0 +1,49 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CANONICAL ENTITY: aircraft_observation (v1)
+# ═══════════════════════════════════════════════════════════════════════════
+# A canonical entity is a definition without rows: the shared, enterprise-level
+# standard that data products conform to. Its mandatory attributes are the
+# non-nullable fields of the schema below. Products declare conformance with
+# `metadata.conforms_to: [{entity: aircraft_observation@1}]`.
+
+kind: "canonical_entity"
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "aircraft_observation"
+  namespace: "aviation"
+  display_name: "Aircraft Observation"
+  description: |
+    Canonical definition of a single aircraft observation: a positional
+    reading of one aircraft at one moment in time. Any data product that
+    publishes aircraft observations must carry these mandatory attributes.
+
+  owner:
+    team: "data-architecture"
+    email: "data-architecture@example.com"
+    mattermost: "data-architecture"
+
+  tags:
+    - "aviation"
+    - "canonical"
+
+  created_at: "2026-06-29"
+  updated_at: "2026-06-29"
+  created_by: "data-architecture@example.com"
+
+# Mandatory attributes are declared as the non-nullable fields of this schema.
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-06-29"
+    author: "data-architecture@example.com"
+    changes:
+      - type: "initial"
+        description: "First canonical definition of the aircraft observation entity"
+    breaking: false

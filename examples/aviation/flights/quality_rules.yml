@@ -1,0 +1,118 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# QUALITY RULES: aviation/flights
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Quality validation rules for flight data.
+#
+# Severity levels:
+#   - error:   the record is sent to the DLQ (Dead Letter Queue)
+#   - warning: the record passes, but a warning is logged
+#   - info:    metrics only, no logging
+#
+# ═══════════════════════════════════════════════════════════════════════════
+
+version: "1.0"
+
+rules:
+  # ═══════════════════════════════════════════════════════════════════════
+  # NOT NULL CHECKS
+  # ═══════════════════════════════════════════════════════════════════════
+  
+  - name: "icao24_not_null"
+    field: "icao24"
+    type: "not_null"
+    severity: "error"
+    message: "ICAO24 address is required"
+  
+  - name: "origin_country_not_null"
+    field: "origin_country"
+    type: "not_null"
+    severity: "error"
+    message: "Origin country is required"
+  
+  - name: "timestamp_not_null"
+    field: "timestamp"
+    type: "not_null"
+    severity: "error"
+    message: "Timestamp is required"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # FORMAT CHECKS
+  # ═══════════════════════════════════════════════════════════════════════
+  
+  - name: "icao24_format"
+    field: "icao24"
+    type: "regex"
+    pattern: "^[a-f0-9]{6}$"
+    severity: "error"
+    message: "ICAO24 must be 6 lowercase hex characters"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # RANGE CHECKS - Coordinates
+  # ═══════════════════════════════════════════════════════════════════════
+  
+  - name: "latitude_range"
+    field: "latitude"
+    type: "range"
+    min: -90
+    max: 90
+    severity: "error"
+    message: "Latitude must be between -90 and 90 degrees"
+  
+  - name: "longitude_range"
+    field: "longitude"
+    type: "range"
+    min: -180
+    max: 180
+    severity: "error"
+    message: "Longitude must be between -180 and 180 degrees"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # RANGE CHECKS - Flight parameters
+  # ═══════════════════════════════════════════════════════════════════════
+  
+  - name: "altitude_range"
+    field: "altitude"
+    type: "range"
+    min: -500
+    max: 50000
+    severity: "warning"
+    message: "Altitude outside normal range (-500 to 50000 meters)"
+  
+  - name: "velocity_range"
+    field: "velocity"
+    type: "range"
+    min: 0
+    max: 1000
+    severity: "warning"
+    message: "Velocity outside normal range (0 to 1000 m/s)"
+  
+  - name: "heading_range"
+    field: "heading"
+    type: "range"
+    min: 0
+    max: 360
+    severity: "warning"
+    message: "Heading must be between 0 and 360 degrees"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # FRESHNESS CHECK (warning for demo - timestamp in milliseconds)
+  # ═══════════════════════════════════════════════════════════════════════
+  
+  - name: "data_freshness"
+    field: "timestamp"
+    type: "freshness"
+    max_age_minutes: 1
+    severity: "warning"
+    message: "Flight data is older than expected"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # CUSTOM CHECKS
+  # ═══════════════════════════════════════════════════════════════════════
+  
+  - name: "ground_altitude_check"
+    field: "altitude"
+    type: "custom"
+    expression: "not on_ground or (altitude is None or altitude < 100)"
+    severity: "warning"
+    message: "Aircraft on ground should have low or null altitude"

@@ -1,0 +1,154 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# PHYSICAL LAYOUT: aviation/flights
+# ═══════════════════════════════════════════════════════════════════════════
+# Physical storage configuration for Data Engineers
+# ⚠️ Changes to this file do NOT change the manifest version
+
+# ───────────────────────────────────────────────────────────────────────────
+# APACHE ICEBERG TABLE
+# ───────────────────────────────────────────────────────────────────────────
+iceberg:
+  format_version: 2
+  
+  # Catalog metadata
+  catalog:
+    type: "gravitino"
+    uri: "http://gravitino-server:8090"
+    warehouse: "s3://data-lake/aviation"
+    database: "aviation"
+    table: "flights"
+
+# ───────────────────────────────────────────────────────────────────────────
+# PARTITIONING (Hidden Partitioning)
+# ───────────────────────────────────────────────────────────────────────────
+partitioning:
+  strategy: "iceberg_hidden"
+
+  spec:
+    # By date - the primary time filter
+    - source_column: "timestamp"
+      transform: "hour"
+      name: "flight_hour"
+
+    # By origin country - a frequent filter for analytics
+    - source_column: "origin_country"
+      transform: "identity"
+      name: "country"
+
+  notes: |
+    Chosen strategy:
+    - hour(timestamp): for hourly real-time analytics
+    - identity(origin_country): for filtering by country
+
+    Number of partitions per hour: ~200 (countries) × 1 (hour) = ~200 partitions
+
+# ───────────────────────────────────────────────────────────────────────────
+# SORTING (Sort Order)
+# ───────────────────────────────────────────────────────────────────────────
+sort_order:
+  columns:
+    - column: "icao24"
+      direction: "asc"
+      null_order: "nulls_last"
+
+    - column: "timestamp"
+      direction: "desc"
+      null_order: "nulls_last"
+
+  notes: |
+    Sorting by ICAO24 + timestamp optimizes:
+    - Looking up flights of a specific aircraft
+    - Retrieving the latest positions
+
+# ───────────────────────────────────────────────────────────────────────────
+# PARQUET SETTINGS
+# ───────────────────────────────────────────────────────────────────────────
+parquet:
+  compression:
+    codec: "zstd"
+    level: 3
+  
+  row_group:
+    size_bytes: 67108864   # 64 MB (smaller, since it is a high-velocity stream)
+    rows_target: 500000    # 500K rows
+  
+  page:
+    size_bytes: 1048576    # 1 MB
+  
+  dictionary:
+    enabled: true
+    columns:
+      - "icao24"
+      - "origin_country"
+      - "callsign"
+  
+  bloom_filters:
+    enabled: true
+    columns:
+      - column: "icao24"
+        fpp: 0.01
+      - column: "callsign"
+        fpp: 0.01
+      - column: "origin_country"
+        fpp: 0.05
+  
+  column_statistics: true
+
+# ───────────────────────────────────────────────────────────────────────────
+# COMPACTION & MAINTENANCE
+# ───────────────────────────────────────────────────────────────────────────
+maintenance:
+  compaction:
+    enabled: true
+    strategy: "binpack"
+    target_file_size_mb: 128
+    min_input_files: 10
+    max_concurrent_file_group_rewrites: 5
+    schedule: "0 * * * *"  # Every hour
+
+  snapshot_expiration:
+    enabled: true
+    max_snapshot_age_hours: 24  # 1 day
+    min_snapshots_to_keep: 5
+    schedule: "0 2 * * *"  # At 2:00 daily
+
+  orphan_file_cleanup:
+    enabled: true
+    older_than_hours: 48  # 2 days
+    schedule: "0 3 * * 0"  # At 3:00 on Sundays
+
+# ───────────────────────────────────────────────────────────────────────────
+# QUERY PATTERNS (for documentation)
+# ───────────────────────────────────────────────────────────────────────────
+query_patterns:
+  - name: "flight_tracking"
+    description: "Tracking a specific aircraft"
+    frequency: "high"
+    example: |
+      SELECT icao24, latitude, longitude, altitude, velocity, heading, timestamp
+      FROM aviation.flights
+      WHERE icao24 = 'abc123'
+        AND timestamp >= CURRENT_TIMESTAMP - INTERVAL 1 HOUR
+      ORDER BY timestamp DESC
+  
+  - name: "country_traffic"
+    description: "Flight statistics by country"
+    frequency: "medium"
+    example: |
+      SELECT 
+        origin_country,
+        COUNT(*) as flight_count,
+        AVG(altitude) as avg_altitude
+      FROM aviation.flights
+      WHERE timestamp >= CURRENT_TIMESTAMP - INTERVAL 24 HOURS
+      GROUP BY origin_country
+      ORDER BY flight_count DESC
+  
+  - name: "real_time_snapshot"
+    description: "Current snapshot of the airspace"
+    frequency: "high"
+    example: |
+      SELECT icao24, callsign, latitude, longitude, altitude, velocity
+      FROM aviation.flights
+      WHERE timestamp >= CURRENT_TIMESTAMP - INTERVAL 5 MINUTES
+        AND on_ground = false

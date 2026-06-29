@@ -1,0 +1,33 @@
+version: "1.0"
+
+business_terms:
+  - name: "{business_term}"
+    definition: "{What the business term means}"
+    aliases:
+      - "{synonym}"
+    owner: "{business-owner}"
+
+interpretation:
+  grain: "{What one record represents: event/entity/snapshot/etc}"
+  time_basis: "{Which time to use by default: created_at/event_time/etc}"
+  lifecycle:
+    description: "{If the data product has a lifecycle, describe it in words}"
+    terminal_states:
+      - "{terminal state, if applicable}"
+  known_limitations:
+    - "{A limitation in interpreting the data}"
+  do:
+    - "{How to use this data product correctly}"
+  dont:
+    - "{How this data product should not be interpreted}"
+
+typical_questions:
+  - "{A typical question this data product can answer}"
+
+ai_hints:
+  default_time_field: "{timestamp_field}"
+  default_grain: "{day|week|month|event|entity}"
+  recommended_visualizations:
+    - "{line_chart|bar_chart|table}"
+  safe_aggregation_notes:
+    - "{A hint for the AI about safe aggregation or filtering}"

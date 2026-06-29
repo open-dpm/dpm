@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "name": "{EntityName}",
+  "namespace": "{domain}.canonical",
+  "doc": "Canonical attributes of the entity. Non-nullable fields are mandatory.",
+  "fields": [
+    {
+      "name": "{mandatory_attribute}",
+      "type": "string",
+      "doc": "A mandatory canonical attribute (non-nullable)"
+    },
+    {
+      "name": "{optional_attribute}",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "An optional canonical attribute (nullable, not required for conformance)"
+    }
+  ]
+}

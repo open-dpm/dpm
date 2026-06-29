@@ -1,0 +1,431 @@
+# ===============================================================================
+# DATA CONTRACT TEMPLATE
+# ===============================================================================
+#
+# This template defines the structure of a data manifest. A data manifest is a
+# machine-readable specification that describes the data schema, quality rules,
+# service level agreements (SLAs), owners, and data lineage.
+#
+# USAGE:
+#   1. Copy this template to examples/{namespace}/{entity}/manifest.yaml
+#   2. Replace all {placeholder} values with real data
+#   3. Create the companion files: schema.avsc, semantics.yml, quality_rules.yml, sla.yml, runbook.md
+#   4. Create CODEOWNERS with GitLab handles (@username or @group) — the MR cannot be merged without their approval
+#   5. Submit a merge request for governance review
+#
+# VALIDATION:
+#   dpm validate examples/{namespace}/{entity}/
+#
+# ===============================================================================
+
+# -------------------------------------------------------------------------------
+# VERSIONS (Required)
+# -------------------------------------------------------------------------------
+
+# Specification version — defines the manifest format
+# Do not change this value unless you are migrating to a new format
+spec_version: "1.0.0"
+
+# Manifest version — follows Semantic Versioning (https://semver.org/)
+# MAJOR: Breaking changes (removing a field, changing a type, removing an enum).
+#        A MAJOR change is published as a new version that runs alongside the old one;
+#        deprecate and retire the previous version only after consumers have migrated
+#        (see the deprecation section below and the runbook).
+# MINOR: Backward-compatible additions (new nullable field, new enum value)
+# PATCH: Documentation or metadata changes only
+#
+# IMPORTANT: The CI pipeline requires the version to be bumped on schema changes
+# Use: dpm suggest-version to get a version recommendation
+manifest_version: "1.0.0"
+
+# Manifest lifecycle status
+# Allowed values: draft | active | deprecated | retired
+#   draft      — manifest under development, not yet used by consumers
+#   active     — manifest approved and used in production
+#   deprecated — manifest marked for retirement, consumers should migrate
+#   retired    — manifest fully decommissioned
+status: "draft"
+
+# -------------------------------------------------------------------------------
+# METADATA BLOCK (Required)
+# -------------------------------------------------------------------------------
+# Business metadata describing the data product, owners, and classification.
+# This information is synchronized with the data catalog.
+
+metadata:
+  # REQUIRED: Unique identifier within the namespace
+  # Format: snake_case, lowercase, letters and digits with underscores
+  # Pattern: ^[a-z][a-z0-9_]*$
+  # Examples: "orders", "customer_events", "inventory_snapshots"
+  name: "{entity}"
+
+  # REQUIRED: Domain namespace grouping related entities
+  # Format: snake_case, lowercase, letters and digits with underscores
+  # Pattern: ^[a-z][a-z0-9_]*$
+  # Examples: "sales", "warehouse", "crm", "finance"
+  namespace: "{namespace}"
+
+  # REQUIRED: Broad data category following the DMBOK approach
+  # Allowed values:
+  #   transactional_data — business events and operational facts
+  #   master_data        — core business entities
+  #   reference_data     — lookup tables and classifiers
+  #   analytical_data    — aggregates, data marts, ML features, KPIs
+  data_category: "transactional_data"
+
+  # REQUIRED: whether this product contains personal data (PII).
+  # Must be consistent with the per-field "pii": true annotations in schema.avsc.
+  pii: false
+
+  # OPTIONAL: Human-readable display name
+  # Used in the data catalog and documentation
+  display_name: "{Entity name}"
+
+  # OPTIONAL, but RECOMMENDED: Detailed description
+  # Include: What the data represents, where it comes from, how it is used
+  # Use multi-line YAML format for long descriptions
+  description: |
+    A short description of what this data represents.
+
+    **Source:** Where does this data come from?
+
+    **Use cases:**
+    - Scenario 1: Description
+    - Scenario 2: Description
+
+    **Important notes:**
+    - Any caveats or special considerations
+    - Known limitations
+
+  # -------------------------------------------------------------------------
+  # OWNER BLOCK (Required)
+  # -------------------------------------------------------------------------
+  # Defines the team responsible for this data manifest.
+  # The owner is responsible for:
+  #   - Data quality and accuracy
+  #   - Maintaining and updating the manifest
+  #   - Incident response and consumer support
+  #   - Compliance with governance policies
+
+  owner:
+    # REQUIRED: Name of the team responsible for the manifest
+    # Should match your organization's team naming convention
+    team: "{team-name}"
+
+    # REQUIRED: Email for alerts, notifications, and escalations
+    # Should be a monitored mailbox or mailing list
+    # Format: Valid email address
+    email: "{team-name}@example.com"
+
+    # OPTIONAL, but RECOMMENDED: Chat channel for operational alerts
+    # Format: Channel name without prefix for Mattermost
+    # Pattern: ^[a-z0-9_-]+$
+    mattermost: "{team-name}-alerts"
+
+    # OPTIONAL, but RECOMMENDED for critical manifests: On-call integration
+    # Link to the incident management system
+    on_call: "https://oncall.example.com/teams/{team-name}"
+
+  # -------------------------------------------------------------------------
+  # SYSTEMS BLOCK (Optional, but recommended)
+  # -------------------------------------------------------------------------
+  # Only the source system is captured here.
+  # Mission-critical consumers are described in lineage.downstream.
+
+  systems:
+    # Producer system — the source of this data
+    producer: "{Source system name}"
+
+  # -------------------------------------------------------------------------
+  # TAGS (Optional, but recommended)
+  # -------------------------------------------------------------------------
+  # Tags enable filtering, search, and policy enforcement in the data catalog.
+  # Use a consistent organizational taxonomy.
+
+  tags:
+    # Domain / business area tags
+    - "{domain}"                  # e.g.: "sales", "marketing", "operations"
+
+    # Data classification tags (uncomment as needed)
+    # - "confidential"            # Confidential business data
+    # - "public"                  # Public information
+
+    # Criticality tags (uncomment as needed)
+    # - "critical"                # Business-critical — high SLA requirements
+    # - "tier-1"                  # Tier 1 data product
+
+    # Technical tags
+    # - "realtime"                # Real-time / streaming data
+    # - "batch"                   # Batch / periodic data
+    # - "cdc"                     # Change Data Capture source
+
+  # -------------------------------------------------------------------------
+  # ENTERPRISE DATA MODEL CONFORMANCE (Optional)
+  # -------------------------------------------------------------------------
+  # Declare the canonical entities this product represents. Validated by
+  # `dpm validate-conformance`: the product schema must carry every mandatory
+  # attribute of each entity (its non-nullable canonical fields), with a
+  # compatible type. Pin the MAJOR version only ("name@N"). Use `rename` only
+  # for attributes whose physical field name differs from the canonical name;
+  # everything else matches by name. Omit this block entirely if the product
+  # is outside the EDM.
+  # conforms_to:
+  #   - entity: "customer@1"
+  #     rename:
+  #       customer_id: "cust_id"    # canonical attribute -> physical field
+
+  # -------------------------------------------------------------------------
+  # VERSION METADATA (Optional, but recommended)
+  # -------------------------------------------------------------------------
+  # Audit trail for manifest creation and changes.
+
+  # Date the manifest was first created
+  # Format: ISO 8601 date (YYYY-MM-DD)
+  created_at: "{YYYY-MM-DD}"
+
+  # Date the manifest was last modified
+  # Format: ISO 8601 date (YYYY-MM-DD)
+  # The CI pipeline may update this field automatically
+  updated_at: "{YYYY-MM-DD}"
+
+  # Email of the manifest creator
+  created_by: "{your-email}@example.com"
+
+# -------------------------------------------------------------------------------
+# SCHEMA REFERENCE (Required)
+# -------------------------------------------------------------------------------
+# Reference to the Avro schema defining the data structure.
+# The schema is the source of truth for field definitions.
+
+schema:
+  # REQUIRED: Relative path to the Avro schema file
+  # By convention this is always named "schema.avsc" in the same directory
+  file: "./schema.avsc"
+
+  # REQUIRED: Serialization format
+  # Allowed values: avro | json | protobuf | parquet
+  # Avro is the default format, recommended for Kafka
+  format: "avro"
+
+# -------------------------------------------------------------------------------
+# SEMANTICS REFERENCE (Required)
+# -------------------------------------------------------------------------------
+# Reference to the business semantics of the data product: terms, metrics,
+# formulas, field meaning, valid business questions, and AI/RAG hints.
+
+semantics:
+  # REQUIRED: Relative path to the business semantics file
+  file: "./semantics.yml"
+
+# -------------------------------------------------------------------------------
+# QUALITY RULES REFERENCE (Required)
+# -------------------------------------------------------------------------------
+# Reference to the data quality rules that validate each record.
+# Records that fail rules with severity "error" are routed to the DLQ.
+
+quality_rules:
+  # REQUIRED: Relative path to the quality rules file
+  file: "./quality_rules.yml"
+
+  # OPTIONAL: Enable/disable quality validation
+  # Set to false to temporarily disable (not recommended for production)
+  enabled: true
+
+  # OPTIONAL: Validation mode
+  # Allowed values: strict | permissive
+  # strict: All rules are applied
+  # permissive: Only rules with severity=error are applied
+  # mode: "strict"
+
+# -------------------------------------------------------------------------------
+# SLA REFERENCE (Required)
+# -------------------------------------------------------------------------------
+# Reference to the service level agreement (SLA) defining availability,
+# data freshness, response time, and retention policies.
+
+sla:
+  # REQUIRED: Relative path to the SLA definition file
+  file: "./sla.yml"
+
+# -------------------------------------------------------------------------------
+# PHYSICAL LAYOUT REFERENCE (Optional)
+# -------------------------------------------------------------------------------
+# Reference to the physical storage configuration for the Data Lake (Iceberg/Parquet).
+# This file is usually edited by Data Engineers, not Data Owners.
+
+physical_layout:
+  # OPTIONAL: Relative path to the physical layout definition
+  file: "./physical_layout.yml"
+
+# -------------------------------------------------------------------------------
+# RUNBOOK REFERENCE (Required)
+# -------------------------------------------------------------------------------
+# Reference to the operational runbook for incident response and diagnostics.
+
+runbook:
+  # REQUIRED: Relative path to the runbook documentation
+  file: "./runbook.md"
+
+# -------------------------------------------------------------------------------
+# LINEAGE SECTION (Required)
+# -------------------------------------------------------------------------------
+# Documents the data flow from source systems to consumers.
+# Accurate lineage is critical for impact analysis and compliance.
+
+lineage:
+  # -------------------------------------------------------------------------
+  # UPSTREAM SOURCES
+  # -------------------------------------------------------------------------
+  # Where does this data come from? List all source systems.
+
+  upstream:
+    - system: "{Source system name}"   # e.g.: "1C Enterprise", "PostgreSQL CRM"
+
+      # Connection string or identifier (mask credentials)
+      database: "{connection-string}"          # e.g.: "postgres://host:5432/db"
+
+      # OPTIONAL: Data extraction method
+      # Allowed values: cdc | batch | realtime | api
+      extraction_method: "cdc"
+
+      # OPTIONAL: For batch extraction — schedule (cron format)
+      # extraction_schedule: "0 */6 * * *"     # Every 6 hours
+
+      # Source tables or entities
+      tables:
+        - "{source_table_1}"
+        - "{source_table_2}"
+
+      # OPTIONAL: Column-level lineage for critical fields
+      # column_mapping:
+      #   - source: "source_field"
+      #     target: "target_field"
+      #     transformation: "none | type_cast | formula"
+
+  # -------------------------------------------------------------------------
+  # MISSION-CRITICAL DOWNSTREAM CONSUMERS
+  # -------------------------------------------------------------------------
+  # List only critical business/product subscribers.
+  # Technical intermediate layers are better kept in the product/catalog layer.
+
+  downstream:
+    - system: "{Consumer system}"             # e.g.: "Sales Dashboard"
+      team: "{consumer-team}"                  # responsible team
+      contact: "{email or chat channel}"       # where to reach out on breaking changes
+      type: "dashboard"                        # dashboard | service | ml_consumer | report
+      platform: "{platform}"                   # superset | kafka | feature-store | custom
+      objects:
+        - "{technical-object-id}"              # dashboard id, topic, feature set, report id
+      usage: "{Why the consumer uses this data}"
+      criticality: "critical"
+
+# -------------------------------------------------------------------------------
+# DEPRECATION SECTION (Optional)
+# -------------------------------------------------------------------------------
+# Manages the manifest lifecycle when it is being decommissioned.
+# Activate this section when planning the sunset of a manifest.
+
+deprecation:
+  # Is this manifest deprecated?
+  deprecated: false
+
+  # Uncomment and fill in when deprecating:
+  # deprecated: true
+  # deprecated_at: "{YYYY-MM-DD}"           # When it was marked deprecated
+  # sunset_date: "{YYYY-MM-DD}"             # Agreed migration deadline (set per contract)
+  # successor: "{namespace}/{entity}-v2"    # Path to the replacement manifest (runs side by side)
+  # migration_guide: "./MIGRATION.md"       # Migration guide for consumers
+  #
+  # # Known/critical consumers still to migrate. The full consumer population is tracked
+  # # outside the contract, in your access/policy layer (e.g. OPA) — list only the ones
+  # # you track here; all consumers must migrate before sunset.
+  # remaining_consumers:
+  #   - name: "{Consumer name}"
+  #     team: "{team}"
+  #     target_migration_date: "{YYYY-MM-DD}"
+  #     status: "planned | in_progress | completed"
+
+# -------------------------------------------------------------------------------
+# CHANGELOG SECTION (Required)
+# -------------------------------------------------------------------------------
+# Documents all manifest changes over time.
+# This is critical for auditing and understanding the manifest's evolution.
+#
+# Change types:
+#   - initial: First version of the manifest
+#   - added: New field, rule, or capability added
+#   - changed: Existing field or rule modified
+#   - deprecated: Field or rule marked for future removal
+#   - removed: Field or rule removed (breaking change)
+#   - fixed: Bug fix
+#   - security: Security-related change
+
+changelog:
+  # Most recent change first
+
+  # Example: Minor version — adding a field
+  # - version: "1.1.0"
+  #   date: "2026-02-15"
+  #   author: "developer@example.com"
+  #   changes:
+  #     - type: "added"
+  #       description: "Added discount_code field (nullable)"
+  #       fields: ["discount_code"]
+  #     - type: "added"
+  #       description: "Added quality rule for discount validation"
+  #   breaking: false
+  #   jira: "DATA-123"
+
+  # Example: Major version — breaking change
+  # - version: "2.0.0"
+  #   date: "2026-03-01"
+  #   author: "developer@example.com"
+  #   changes:
+  #     - type: "changed"
+  #       description: "Changed status field type from string to enum"
+  #       fields: ["status"]
+  #       migration_required: true
+  #     - type: "removed"
+  #       description: "Removed deprecated legacy_id field"
+  #       fields: ["legacy_id"]
+  #   breaking: true
+  #   jira: "DATA-456"
+  #   migration_guide: "./MIGRATION_V2.md"
+
+  # Initial version entry (always present)
+  - version: "1.0.0"
+    date: "{YYYY-MM-DD}"
+    author: "{your-email}@example.com"
+    changes:
+      - type: "initial"
+        description: "Initial manifest creation"
+    breaking: false
+    # jira: "{JIRA-TICKET}"             # Optional: Link to a Jira ticket
+
+# -------------------------------------------------------------------------------
+# ADDITIONAL METADATA (Optional)
+# -------------------------------------------------------------------------------
+# Extended metadata for specific use cases.
+
+# additional:
+#   # Link to external documentation
+#   documentation_url: "https://wiki.example.com/data/{namespace}/{entity}"
+#
+#   # Link to a runbook in an external system
+#   runbook_url: "https://runbooks.example.com/{namespace}/{entity}"
+#
+#   # Regulations and standards applicable to this data
+#   compliance:
+#     - "PCI-DSS"        # International standard for payment cards
+#
+#   # Data classification level
+#   classification: "confidential"       # public | internal | confidential | restricted
+#
+#   # Cost center for chargeback
+#   cost_center: "CC-12345"
+#
+#   # Custom metadata specific to your organization
+#   custom:
+#     business_owner: "Name"
+#     data_domain: "Customer"
+#     refresh_type: "incremental"

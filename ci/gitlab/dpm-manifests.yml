@@ -1,0 +1,68 @@
+# Include-ready GitLab CI template for user manifest repositories
+# Usage in your repo's .gitlab-ci.yml:
+#
+# include:
+#   - remote: 'https://raw.githubusercontent.com/open-dpm/dpm/main/ci/gitlab/dpm-manifests.yml'
+#
+# variables:
+#   DPM_MANIFESTS_PATH: "manifests"  # directory holding your manifests (default: repo root)
+#   DPM_PKG: "dpm @ git+https://gitlab.example.com/data/dpm.git@v0.2.0"  # install source
+#   DPM_IMAGE: "registry.gitlab.example.com/data/dpm:0.2.0"             # prebuilt image (faster)
+#
+# Two ways to get the tool, set once as group-level CI/CD variables:
+#   - DPM_PKG   — install source, when the job installs DPM with pip (default).
+#   - DPM_IMAGE — a prebuilt image that already has DPM; the install step is then skipped,
+#                 so the pipeline runs without pip install on every commit. See docs/gitlab-setup.md.
+#
+# This template only validates manifests. Merge-request approvals (how many,
+# and by whom) are intentionally left to your platform's own approval rules.
+
+variables:
+  DPM_PKG: "dpm @ git+https://github.com/open-dpm/dpm.git@main"
+  DPM_IMAGE: "python:3.12-slim"
+  # Enterprise Data Model conformance (optional). Leave DPM_CANONICAL_REPO_URL
+  # empty to skip the conformance job. Set it (host/path, no scheme) to the
+  # canonical-entities repo; CI clones it read-only via $CI_JOB_TOKEN, so add
+  # your group to that repo's CI job token allowlist (Settings > CI/CD > Token
+  # Access). No stored token needed.
+  DPM_CANONICAL_REPO_URL: ""
+  DPM_CANONICAL_REGISTRY: "canonical_registry"
+
+.dpm_base:
+  image: "$DPM_IMAGE"
+  before_script:
+    # Skip installation if the image already ships DPM (e.g. DPM_IMAGE points at a prebuilt one).
+    - command -v dpm >/dev/null 2>&1 || pip install --quiet "${DPM_PKG}"
+
+dpm:validate:
+  extends: .dpm_base
+  stage: validate
+  script:
+    - dpm validate --all --base-path "${DPM_MANIFESTS_PATH:-.}"
+  rules:
+    - changes:
+        - "**/manifest.yaml"
+
+# Checks that products conform to the canonical entities they declare in
+# `metadata.conforms_to`. Skipped automatically when DPM_CANONICAL_REPO_URL is
+# unset. The canonical repo is pulled at its latest state; conforms_to pins the
+# major, so a sunset (removed vN/) turns laggards red here.
+dpm:conformance:
+  extends: .dpm_base
+  stage: validate
+  script:
+    - |
+      if [ -z "${DPM_CANONICAL_REPO_URL}" ]; then
+        echo "DPM_CANONICAL_REPO_URL not set - skipping EDM conformance check"
+        exit 0
+      fi
+      git clone --depth 1 \
+        "https://gitlab-ci-token:${CI_JOB_TOKEN}@${DPM_CANONICAL_REPO_URL}" \
+        "${DPM_CANONICAL_REGISTRY}"
+      dpm validate-conformance --all \
+        --base-path "${DPM_MANIFESTS_PATH:-.}" \
+        --registry-path "${DPM_CANONICAL_REGISTRY}"
+  rules:
+    - changes:
+        - "**/manifest.yaml"
+        - "**/schema.avsc"

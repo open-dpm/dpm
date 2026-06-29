@@ -1,0 +1,4 @@
+# Owner of the aircraft_observation canonical entity.
+# Nearest-CODEOWNERS-wins: changes under this entity require this approval,
+# falling back to the registry-root CODEOWNERS only if this file is absent.
+* @data-architecture

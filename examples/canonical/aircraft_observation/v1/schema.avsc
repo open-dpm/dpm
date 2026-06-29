@@ -1,0 +1,37 @@
+{
+  "type": "record",
+  "name": "AircraftObservation",
+  "namespace": "aviation.canonical",
+  "doc": "Canonical aircraft observation: mandatory attributes are the non-nullable fields",
+  "fields": [
+    {
+      "name": "icao24",
+      "type": "string",
+      "doc": "Unique ICAO 24-bit transponder address (mandatory)"
+    },
+    {
+      "name": "latitude",
+      "type": "double",
+      "doc": "Latitude in degrees, WGS84 (mandatory)"
+    },
+    {
+      "name": "longitude",
+      "type": "double",
+      "doc": "Longitude in degrees, WGS84 (mandatory)"
+    },
+    {
+      "name": "observed_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Observation time, UTC milliseconds (mandatory)"
+    },
+    {
+      "name": "callsign",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Aircraft callsign (optional canonical attribute)"
+    }
+  ]
+}

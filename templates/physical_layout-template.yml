@@ -1,0 +1,251 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# PHYSICAL LAYOUT TEMPLATE
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Storage format: Apache Parquet
+# Tables: Apache Iceberg
+#
+# ⚠️ Editing this file does NOT change the manifest version!
+# Edited by: Data Engineers
+#
+# This file describes the physical representation of the data in the Data Lake:
+# - Partitioning (Iceberg hidden partitioning)
+# - Sorting (sort order)
+# - Compression (Parquet codecs)
+# - Query optimization (bloom filters, z-order)
+# - Maintenance (compaction, snapshots)
+#
+# ═══════════════════════════════════════════════════════════════════════════
+
+version: "1.0"
+
+# ───────────────────────────────────────────────────────────────────────────
+# ICEBERG TABLE CONFIGURATION
+# ───────────────────────────────────────────────────────────────────────────
+iceberg:
+  format_version: 2  # v1 | v2 (v2 supports row-level updates/deletes)
+
+  # Metadata catalog
+  # ⚠️ RECOMMENDED: gravitino (unified metadata layer)
+  # Alternatives: rest | hive | glue
+  catalog:
+    type: "gravitino"  # gravitino | rest | hive | glue
+    uri: "http://gravitino-server:8090"
+    warehouse: "s3://data-lake/warehouse"
+    database: "<domain>"
+    table: "<entity>"
+    # For REST Catalog:
+    # type: "rest"
+    # uri: "http://iceberg-rest:8181"
+
+  namespace: ["<domain>"]
+
+  properties:
+    "write.format.default": "parquet"
+    "write.parquet.compression-codec": "zstd"
+    "write.parquet.compression-level": "3"
+    "write.metadata.compression-codec": "gzip"
+    "write.target-file-size-bytes": "536870912"  # 512 MB
+    "write.delete.mode": "merge-on-read"
+    "history.expire.min-snapshots-to-keep": "10"
+    "history.expire.max-snapshot-age-ms": "2592000000"  # 30 days
+
+# ───────────────────────────────────────────────────────────────────────────
+# PARTITIONING
+# ───────────────────────────────────────────────────────────────────────────
+partitioning:
+  strategy: "iceberg_hidden"
+
+  spec:
+    # Time-based partitioning
+    - source_column: "<timestamp_field>"
+      transform: "day"  # year | month | day | hour
+      partition_field: "<timestamp_field>_day"
+      reason: "<rationale>"
+
+    # Bucket partitioning (for high cardinality columns)
+    # - source_column: "<high_cardinality_field>"
+    #   transform: "bucket[16]"
+    #   partition_field: "<field>_bucket"
+    #   reason: "<rationale>"
+
+    # Truncate partitioning (for strings)
+    # - source_column: "<string_field>"
+    #   transform: "truncate[4]"
+    #   partition_field: "<field>_trunc"
+    #   reason: "<rationale>"
+
+  evolution:
+    enabled: true
+    reason: "Iceberg allows changing partitioning without rewriting data"
+
+# ───────────────────────────────────────────────────────────────────────────
+# SORTING (Sort Order)
+# ───────────────────────────────────────────────────────────────────────────
+sort_order:
+  enabled: true
+
+  fields:
+    - column: "<frequently_filtered_column>"
+      direction: "asc"  # asc | desc
+      null_order: "nulls-first"  # nulls-first | nulls-last
+      reason: "<rationale>"
+
+    - column: "<timestamp_column>"
+      direction: "desc"
+      null_order: "nulls-last"
+      reason: "<rationale>"
+
+# ───────────────────────────────────────────────────────────────────────────
+# PARQUET CONFIGURATION
+# ───────────────────────────────────────────────────────────────────────────
+parquet:
+  row_group_size: 134217728  # 128 MB
+  page_size: 1048576  # 1 MB
+
+  compression:
+    codec: "zstd"
+    level: 3
+    reason: "Balance between compression ratio and speed"
+
+  column_compression:
+    # Examples:
+    # - column: "<string_column>"
+    #   codec: "snappy"
+    #   reason: "Low-repetition strings - snappy is faster"
+    #
+    # - column: "<enum_column>"
+    #   codec: "dictionary"
+    #   reason: "Low cardinality - dictionary encoding is effective"
+
+  bloom_filters:
+    # Add for columns with frequent point lookups:
+    # - column: "<id_column>"
+    #   fpp: 0.01
+    #   reason: "Frequent point lookups"
+
+# ───────────────────────────────────────────────────────────────────────────
+# COMPACTION & OPTIMIZATION
+# ───────────────────────────────────────────────────────────────────────────
+compaction:
+  small_files:
+    enabled: true
+    target_file_size_mb: 512
+    min_file_size_mb: 128
+    trigger_threshold: 10
+    schedule: "0 2 * * *"  # Cron expression
+
+  bin_packing:
+    enabled: true
+    target_file_size_mb: 512
+    min_input_files: 5
+
+  # Z-ordering (optional, for multi-dimensional filtering)
+  z_order:
+    enabled: false
+    columns: []
+    # columns:
+    #   - "<column1>"
+    #   - "<column2>"
+
+# ───────────────────────────────────────────────────────────────────────────
+# SNAPSHOTS & TIME TRAVEL
+# ───────────────────────────────────────────────────────────────────────────
+snapshots:
+  retention:
+    min_snapshots_to_keep: 10
+    max_age_days: 30
+    reason: "For debugging and rollback"
+
+  expiration:
+    schedule: "0 3 * * 0"  # Weekly
+    older_than_days: 30
+
+# ───────────────────────────────────────────────────────────────────────────
+# QUERY PATTERNS
+# ───────────────────────────────────────────────────────────────────────────
+query_patterns:
+  - name: "<pattern_name>"
+    description: "<query description>"
+    frequency: "high"  # very_high | high | medium | low
+    query: |
+      SELECT ...
+      FROM <table>
+      WHERE ...
+    optimization: |
+      <description of optimizations for this query>
+
+# ───────────────────────────────────────────────────────────────────────────
+# PERFORMANCE TARGETS
+# ───────────────────────────────────────────────────────────────────────────
+performance:
+  point_lookup:
+    target_latency_p50: "100ms"
+    target_latency_p99: "500ms"
+
+  range_scan:
+    target_latency_p50: "1s"
+    target_latency_p99: "5s"
+
+  full_scan:
+    target_throughput: "1GB/s per core"
+
+# ───────────────────────────────────────────────────────────────────────────
+# STORAGE
+# ───────────────────────────────────────────────────────────────────────────
+storage:
+  avg_row_size_bytes: 0
+  compression_ratio: 4.5
+
+  growth:
+    daily_rows: 0
+    daily_size_compressed_gb: 0
+    annual_size_compressed_tb: 0
+
+  tiering:
+    hot:
+      duration: "P30D"
+      storage_class: "S3 Standard"
+      reason: "Recent data, active access"
+
+    warm:
+      duration: "P365D"
+      storage_class: "S3 Intelligent-Tiering"
+      reason: "Infrequent access"
+
+    cold:
+      duration: "P7Y"
+      storage_class: "S3 Glacier"
+      reason: "Archive for compliance"
+
+# ───────────────────────────────────────────────────────────────────────────
+# MONITORING
+# ───────────────────────────────────────────────────────────────────────────
+monitoring:
+  metrics:
+    - name: "table_size_gb"
+      query: "SELECT SUM(file_size_in_bytes) / 1024^3 FROM <table>.files"
+      alert_threshold: "> <value>"
+
+    - name: "small_files_count"
+      query: "SELECT COUNT(*) FROM <table>.files WHERE file_size_in_bytes < 128*1024^2"
+      alert_threshold: "> 100"
+
+  maintenance:
+    - task: "expire_snapshots"
+      schedule: "0 3 * * 0"
+      command: "CALL system.expire_snapshots('<table>', TIMESTAMP '<date>', 10)"
+
+    - task: "remove_orphan_files"
+      schedule: "0 4 * * 0"
+      command: "CALL system.remove_orphan_files('<table>')"
+
+    - task: "compact_small_files"
+      schedule: "0 2 * * *"
+      command: "CALL system.rewrite_data_files('<table>')"
+
+# ───────────────────────────────────────────────────────────────────────────
+# NOTES
+# ───────────────────────────────────────────────────────────────────────────
+notes: |
+  Additional information and best practices for Data Engineers.

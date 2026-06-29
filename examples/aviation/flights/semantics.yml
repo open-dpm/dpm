@@ -1,0 +1,48 @@
+version: "1.0"
+
+business_terms:
+  - name: "flight_state"
+    definition: "The state of an aircraft at a specific moment of observation"
+    aliases:
+      - "flight"
+      - "aircraft position"
+    owner: "data-platform"
+
+  - name: "air_traffic"
+    definition: "A set of aircraft observations within a selected area or time period"
+    aliases:
+      - "air traffic"
+      - "aviation movement"
+    owner: "data-platform"
+
+interpretation:
+  grain: "one observation per aircraft state update"
+  time_basis: "timestamp"
+  lifecycle:
+    description: "A record reflects an aircraft observation at the moment ADS-B data is received"
+    terminal_states: []
+  known_limitations:
+    - "The absence of a record does not mean the absence of an aircraft: the source may not have transmitted an observation"
+    - "The data is suitable for demos and monitoring, but is not a legally authoritative source of aviation information"
+  do:
+    - "Use timestamp as the observation time"
+    - "Use icao24 as the technical aircraft identifier"
+  dont:
+    - "Do not use this stream for official navigation or flight safety"
+    - "Do not compute aviation KPIs without a separate business methodology"
+
+typical_questions:
+  - "How many aircraft were active in the last hour?"
+  - "What is the average aircraft speed by country?"
+  - "Where is air traffic heaviest right now?"
+
+ai_hints:
+  default_time_field: "timestamp"
+  default_grain: "minute"
+  recommended_visualizations:
+    - "map"
+    - "line_chart"
+    - "table"
+  safe_aggregation_notes:
+    - "To count aircraft, use unique icao24 values within the selected time window"
+    - "For a map, use the latest observation per icao24"
