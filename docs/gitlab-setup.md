@@ -104,11 +104,28 @@ install step entirely — the job just pulls the image and runs `dpm`.
 
 Pick one of:
 
-- **Public image (simplest).** Set a group-level variable `DPM_IMAGE = ghcr.io/open-dpm/dpm:v0.1.0`.
-- **Your own image (recommended inside the company).** Tag your `data/dpm` mirror (e.g. `v0.1.0`);
-  the `build:image` job in its `.gitlab-ci.yml` builds the `Dockerfile` and pushes it to your GitLab
-  Container Registry (`registry.gitlab.example.com/data/dpm:v0.1.0`). Then set the group variable
-  `DPM_IMAGE = registry.gitlab.example.com/data/dpm:0.1.0`.
+- **Public image (simplest).** Set a group-level variable `DPM_IMAGE = ghcr.io/open-dpm/dpm:0.1.0`
+  (the GHCR tag has **no** `v` prefix).
+- **Your own image (recommended inside the company).** The `build:image` job in the mirror's
+  `.gitlab-ci.yml` builds the `Dockerfile` with kaniko and pushes it to your GitLab Container
+  Registry as `registry.gitlab.example.com/data/dpm:<git-tag>` + `:latest`. Then set the group
+  variable `DPM_IMAGE = registry.gitlab.example.com/data/dpm:v0.1.0` — the GitLab image tag is the
+  **git tag itself**, i.e. **with** the `v` (kaniko uses `$CI_COMMIT_TAG`).
+
+**How the build is triggered.** `build:image` runs only in a **tag pipeline** (`rules: if: $CI_COMMIT_TAG`):
+
+- **A tag that came in via import** (e.g. `v0.1.0`) already exists and never ran a pipeline — and you
+  cannot re-create it. Build it once **manually**: `data/dpm` → **Build → Pipelines → Run pipeline** →
+  in *Run for*, pick the **tag** `v0.1.0` → **Run**. That tag pipeline sets `CI_COMMIT_TAG`, so
+  `build:image` runs and pushes `…/dpm:v0.1.0` + `:latest`.
+- **New versions** synced later (Part 2, `git push origin main --tags`) push a *new* tag, which
+  triggers the tag pipeline **automatically** — the image builds with no manual step.
+
+**No variables to fill in.** `CI_REGISTRY`, `CI_REGISTRY_IMAGE`, `CI_REGISTRY_USER` and
+`CI_REGISTRY_PASSWORD` are **GitLab-predefined** — GitLab injects them per job; you do not set them.
+You only need the project's **Container Registry enabled** (`data/dpm` → **Settings → General →
+Visibility, project features, permissions → Container Registry** = on) and a registry configured on
+the GitLab instance. If the instance has no registry, push to Harbor instead (see the note below).
 
 Set `DPM_IMAGE` with the same flags as `DPM_PKG` — **Mask off, Protect off**. Domains need no
 changes: the CI template uses the image when `DPM_IMAGE` is set and skips `pip install`.
@@ -129,3 +146,5 @@ changes: the CI template uses the image when `DPM_IMAGE` is set and skips `pip i
 - Update: `git pull --ff-only upstream main --tags` → `git push origin main --tags`.
 - Versioning for domains: a GitLab Release from the tag + the `DPM_PKG` group variable.
 - Faster CI: build/pull a DPM image and set the `DPM_IMAGE` group variable (skips `pip install`).
+  Own image: enable the Container Registry, then **Run pipeline** on the existing tag once (new
+  synced tags build automatically); use the tag **with** the `v` for the GitLab image.
