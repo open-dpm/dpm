@@ -47,7 +47,7 @@ metadata:
   conforms_to:
     - entity: "aircraft_observation@1"   # pin the MAJOR version only
       rename:
-        observed_at: "timestamp"         # canonical attribute -> physical field
+        observed_at: "received_at"       # canonical attribute -> physical field
 ```
 
 - Attributes match **by name** by default; use `rename` only where the physical

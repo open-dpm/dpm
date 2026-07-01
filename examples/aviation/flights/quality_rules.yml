@@ -30,11 +30,11 @@ rules:
     severity: "error"
     message: "Origin country is required"
   
-  - name: "timestamp_not_null"
-    field: "timestamp"
+  - name: "received_at_not_null"
+    field: "received_at"
     type: "not_null"
     severity: "error"
-    message: "Timestamp is required"
+    message: "Observation time (received_at) is required"
 
   # ═══════════════════════════════════════════════════════════════════════
   # FORMAT CHECKS
@@ -96,11 +96,11 @@ rules:
     message: "Heading must be between 0 and 360 degrees"
 
   # ═══════════════════════════════════════════════════════════════════════
-  # FRESHNESS CHECK (warning for demo - timestamp in milliseconds)
+  # FRESHNESS CHECK (warning for demo - received_at in milliseconds)
   # ═══════════════════════════════════════════════════════════════════════
-  
+
   - name: "data_freshness"
-    field: "timestamp"
+    field: "received_at"
     type: "freshness"
     max_age_minutes: 1
     severity: "warning"

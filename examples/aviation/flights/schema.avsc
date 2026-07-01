@@ -60,7 +60,7 @@
       "doc": "Whether the aircraft is on the ground"
     },
     {
-      "name": "timestamp",
+      "name": "received_at",
       "type": {
         "type": "long",
         "logicalType": "timestamp-millis"

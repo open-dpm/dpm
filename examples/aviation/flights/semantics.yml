@@ -17,7 +17,7 @@ business_terms:
 
 interpretation:
   grain: "one observation per aircraft state update"
-  time_basis: "timestamp"
+  time_basis: "received_at"
   lifecycle:
     description: "A record reflects an aircraft observation at the moment ADS-B data is received"
     terminal_states: []
@@ -25,7 +25,7 @@ interpretation:
     - "The absence of a record does not mean the absence of an aircraft: the source may not have transmitted an observation"
     - "The data is suitable for demos and monitoring, but is not a legally authoritative source of aviation information"
   do:
-    - "Use timestamp as the observation time"
+    - "Use received_at as the observation time"
     - "Use icao24 as the technical aircraft identifier"
   dont:
     - "Do not use this stream for official navigation or flight safety"
@@ -37,7 +37,7 @@ typical_questions:
   - "Where is air traffic heaviest right now?"
 
 ai_hints:
-  default_time_field: "timestamp"
+  default_time_field: "received_at"
   default_grain: "minute"
   recommended_visualizations:
     - "map"

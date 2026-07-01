@@ -153,7 +153,7 @@ metadata:
   conforms_to:
     - entity: "aircraft_observation@1"   # pin the MAJOR version only
       rename:
-        observed_at: "timestamp"          # only where your field name differs
+        observed_at: "received_at"        # only where your field name differs
 ```
 
 The check then requires your schema to carry every **mandatory** attribute of that entity,

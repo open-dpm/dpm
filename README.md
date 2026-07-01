@@ -58,7 +58,7 @@ Beyond each product's own contract, DPM can tie products to a shared **Enterpris
 metadata:
   conforms_to:
     - entity: "aircraft_observation@1"     # pin the MAJOR version
-      rename: { observed_at: "timestamp" }  # only where field names differ
+      rename: { observed_at: "received_at" }  # only where field names differ
 ```
 
 CI then fails if the product's schema is missing a mandatory canonical attribute, or its type is incompatible or nullable. A product without `conforms_to` is outside the EDM and is not checked. This is conformance to a shared entity model (the DMBOK Enterprise Data Model) — distinct from foreign keys between rows. See [docs/canonical-model.md](docs/canonical-model.md).

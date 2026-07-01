@@ -57,7 +57,7 @@ URL: ${DASHBOARD_URL}/d/flights-pipeline
    ```
 
 2. Common causes:
-   - Stale data (timestamp older than 5 minutes)
+   - Stale data (received_at older than 5 minutes)
    - Malformed ICAO24 value
    - Coordinates out of range
 

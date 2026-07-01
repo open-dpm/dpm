@@ -47,11 +47,11 @@ metadata:
 
   # Enterprise Data Model conformance: this product publishes aircraft
   # observations, so it conforms to the canonical entity. The product field
-  # `timestamp` plays the role of the canonical attribute `observed_at`.
+  # `received_at` plays the role of the canonical attribute `observed_at`.
   conforms_to:
     - entity: "aircraft_observation@1"
       rename:
-        observed_at: "timestamp"
+        observed_at: "received_at"
 
   # Version metadata
   created_at: "2026-01-28"

@@ -26,7 +26,7 @@ partitioning:
 
   spec:
     # By date - the primary time filter
-    - source_column: "timestamp"
+    - source_column: "received_at"
       transform: "hour"
       name: "flight_hour"
 
@@ -37,7 +37,7 @@ partitioning:
 
   notes: |
     Chosen strategy:
-    - hour(timestamp): for hourly real-time analytics
+    - hour(received_at): for hourly real-time analytics
     - identity(origin_country): for filtering by country
 
     Number of partitions per hour: ~200 (countries) × 1 (hour) = ~200 partitions
@@ -51,12 +51,12 @@ sort_order:
       direction: "asc"
       null_order: "nulls_last"
 
-    - column: "timestamp"
+    - column: "received_at"
       direction: "desc"
       null_order: "nulls_last"
 
   notes: |
-    Sorting by ICAO24 + timestamp optimizes:
+    Sorting by ICAO24 + received_at optimizes:
     - Looking up flights of a specific aircraft
     - Retrieving the latest positions
 
@@ -125,11 +125,11 @@ query_patterns:
     description: "Tracking a specific aircraft"
     frequency: "high"
     example: |
-      SELECT icao24, latitude, longitude, altitude, velocity, heading, timestamp
+      SELECT icao24, latitude, longitude, altitude, velocity, heading, received_at
       FROM aviation.flights
       WHERE icao24 = 'abc123'
-        AND timestamp >= CURRENT_TIMESTAMP - INTERVAL 1 HOUR
-      ORDER BY timestamp DESC
+        AND received_at >= CURRENT_TIMESTAMP - INTERVAL 1 HOUR
+      ORDER BY received_at DESC
   
   - name: "country_traffic"
     description: "Flight statistics by country"
@@ -140,7 +140,7 @@ query_patterns:
         COUNT(*) as flight_count,
         AVG(altitude) as avg_altitude
       FROM aviation.flights
-      WHERE timestamp >= CURRENT_TIMESTAMP - INTERVAL 24 HOURS
+      WHERE received_at >= CURRENT_TIMESTAMP - INTERVAL 24 HOURS
       GROUP BY origin_country
       ORDER BY flight_count DESC
   
@@ -150,5 +150,5 @@ query_patterns:
     example: |
       SELECT icao24, callsign, latitude, longitude, altitude, velocity
       FROM aviation.flights
-      WHERE timestamp >= CURRENT_TIMESTAMP - INTERVAL 5 MINUTES
+      WHERE received_at >= CURRENT_TIMESTAMP - INTERVAL 5 MINUTES
         AND on_ground = false

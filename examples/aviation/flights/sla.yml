@@ -23,7 +23,7 @@ availability:
 # ───────────────────────────────────────────────────────────────────────────
 freshness:
   max_age: "PT1M"
-  timestamp_field: "timestamp"
+  timestamp_field: "received_at"
   alert_threshold: "PT30S"
   critical_threshold: "PT2M"
 
