@@ -32,7 +32,7 @@ dev = [
     "avro>=1.11",
     "ruff>=0.6",
     "mypy>=1.11",
-    "types-PyYAML>=6.0",
+    "types-PyYAML>=6.0.12.20260518",
 ]
 
 [project.scripts]
