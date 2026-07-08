@@ -63,6 +63,45 @@ metadata:
 
 CI then fails if the product's schema is missing a mandatory canonical attribute, or its type is incompatible or nullable. A product without `conforms_to` is outside the EDM and is not checked. This is conformance to a shared entity model (the DMBOK Enterprise Data Model) — distinct from foreign keys between rows. See [docs/canonical-model.md](docs/canonical-model.md).
 
+## The conformance graph
+
+`dpm graph` turns the manifests into a picture (Mermaid or JSON) — this is where a shared model earns its keep. Below, three order channels from different domains all conform to the same canonical `order@1`, each with its own physical field name, while a product outside the model sits unattached:
+
+```mermaid
+graph LR
+  o["order@1<br/>canonical · active"]
+  c["customer@2<br/>canonical · active"]
+  web["orders/orders"]
+  pos["orders/pos_orders"]
+  mkt["partners/marketplace_orders"]
+  prof["customers/customer_profiles"]
+  loy["loyalty/members"]
+  camp["marketing/campaigns"]
+  web -->|"created_at→placed_at"| o
+  pos -->|"conforms_to"| o
+  mkt -->|"created_at→ordered_at"| o
+  prof -->|"conforms_to"| c
+  loy -->|"conforms_to"| c
+  classDef entity fill:#dbeafe,stroke:#1e40af,color:#1e3a8a;
+  classDef product fill:#dcfce7,stroke:#166534,color:#14532d;
+  classDef outside fill:#f3f4f6,stroke:#6b7280,color:#374151,stroke-dasharray:4;
+  class o entity;
+  class c entity;
+  class web product;
+  class pos product;
+  class mkt product;
+  class prof product;
+  class loy product;
+  class camp outside;
+```
+
+```bash
+dpm graph --registry-path examples/canonical              # Mermaid (default)
+dpm graph --registry-path examples/canonical --format json
+```
+
+The full catalog graph — deprecated entities, entities with no conformer, and every product — is in [docs/visualization.md](docs/visualization.md).
+
 ## Quickstart
 
 ```bash
