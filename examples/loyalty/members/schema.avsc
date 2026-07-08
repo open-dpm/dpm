@@ -1,0 +1,50 @@
+{
+  "type": "record",
+  "name": "LoyaltyMember",
+  "namespace": "loyalty.members",
+  "doc": "Loyalty programme members (conforms to customer@2)",
+  "fields": [
+    {
+      "name": "customer_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the customer"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "pii": true,
+      "pii_category": "contact",
+      "doc": "Primary email address"
+    },
+    {
+      "name": "full_name",
+      "type": "string",
+      "pii": true,
+      "pii_category": "personal_data",
+      "doc": "Customer full name"
+    },
+    {
+      "name": "country",
+      "type": "string",
+      "doc": "ISO 3166-1 alpha-2 country code of residence"
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "When the customer account was created, UTC milliseconds"
+    },
+    {
+      "name": "tier",
+      "type": "string",
+      "doc": "Loyalty tier: bronze/silver/gold/platinum"
+    },
+    {
+      "name": "points",
+      "type": "int",
+      "doc": "Current loyalty points balance"
+    }
+  ]
+}

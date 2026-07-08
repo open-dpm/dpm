@@ -1,0 +1,63 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT: marketing/campaigns
+# ═══════════════════════════════════════════════════════════════════════════
+# A valid data product that does NOT conform to any canonical entity: its rows
+# are campaigns, a concept the enterprise model does not (yet) define. It shows
+# up in the graph as a product outside the EDM — a deliberate, visible gap.
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "campaigns"
+  namespace: "marketing"
+  data_category: "analytical_data"
+  pii: false
+  display_name: "Marketing Campaigns"
+  description: |
+    Marketing campaigns run across channels: one row per campaign with its
+    channel, budget and run window. Not part of the enterprise data model.
+
+  owner:
+    team: "marketing-analytics"
+    email: "marketing-analytics@example.com"
+    mattermost: "marketing-analytics"
+
+  tags:
+    - "marketing"
+    - "analytics"
+
+  created_at: "2026-04-01"
+  updated_at: "2026-04-01"
+  created_by: "marketing-analytics@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+semantics:
+  file: "./semantics.yml"
+
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+sla:
+  file: "./sla.yml"
+
+lineage:
+  upstream:
+    - system: "Ad platforms"
+      api: "https://ads.example.com/api/campaigns"
+      extraction_method: api
+  downstream: []
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-04-01"
+    author: "marketing-analytics@example.com"
+    changes:
+      - type: "initial"
+        description: "First version of the marketing campaigns product"
+    breaking: false

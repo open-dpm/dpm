@@ -1,0 +1,47 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CANONICAL ENTITY: address (v1)
+# ═══════════════════════════════════════════════════════════════════════════
+# Canonical definition of a postal address. Defined in the model, but no data
+# product publishes it yet — it shows up in the graph as an entity with no
+# conformers (a gap the enterprise model has declared but nobody fills).
+
+kind: "canonical_entity"
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "address"
+  namespace: "canonical"
+  display_name: "Address"
+  description: |
+    Canonical definition of a postal address belonging to a customer. Declared
+    in the enterprise model ahead of any publisher, so conformers can adopt a
+    shared shape when a shipping/address product appears.
+
+  owner:
+    team: "data-architecture"
+    email: "data-architecture@example.com"
+    mattermost: "data-architecture"
+
+  tags:
+    - "canonical"
+    - "master-data"
+
+  created_at: "2026-03-10"
+  updated_at: "2026-03-10"
+  created_by: "data-architecture@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-03-10"
+    author: "data-architecture@example.com"
+    changes:
+      - type: "initial"
+        description: "First canonical definition of the address entity"
+    breaking: false

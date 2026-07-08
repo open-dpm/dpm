@@ -1,0 +1,25 @@
+version: "1.0"
+
+business_terms:
+  - name: "campaign"
+    definition: "A marketing initiative with a budget, channel and run window"
+    aliases:
+      - "marketing campaign"
+    owner: "marketing-analytics"
+
+interpretation:
+  grain: "one row per campaign"
+  time_basis: "start_date"
+  known_limitations:
+    - "Budget is planned, not actual spend"
+
+typical_questions:
+  - "How many campaigns ran per channel last quarter?"
+  - "What is the total planned budget by channel?"
+
+ai_hints:
+  default_time_field: "start_date"
+  default_grain: "week"
+  recommended_visualizations:
+    - "bar_chart"
+    - "table"

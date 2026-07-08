@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT: partners/marketplace_listings
+# ═══════════════════════════════════════════════════════════════════════════
+# Third-party seller listings — a second product whose rows are catalog
+# products, conforming to the same canonical product@1 as the first-party
+# catalog.
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "marketplace_listings"
+  namespace: "partners"
+  data_category: "master_data"
+  pii: false
+  display_name: "Marketplace Listings"
+  description: |
+    Products listed by third-party marketplace sellers: one row per listing
+    with its SKU, name, price and originating seller.
+
+  owner:
+    team: "partnerships"
+    email: "partnerships@example.com"
+    mattermost: "partnerships"
+
+  tags:
+    - "catalog"
+    - "partners"
+
+  conforms_to:
+    - entity: "product@1"
+
+  created_at: "2026-04-12"
+  updated_at: "2026-04-12"
+  created_by: "partnerships@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+semantics:
+  file: "./semantics.yml"
+
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+sla:
+  file: "./sla.yml"
+
+lineage:
+  upstream:
+    - system: "Marketplace partners API"
+      api: "https://partners.example.com/api/listings"
+      extraction_method: api
+  downstream: []
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-04-12"
+    author: "partnerships@example.com"
+    changes:
+      - type: "initial"
+        description: "First version of the marketplace listings product"
+    breaking: false

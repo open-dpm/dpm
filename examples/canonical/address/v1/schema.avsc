@@ -1,0 +1,44 @@
+{
+  "type": "record",
+  "name": "Address",
+  "namespace": "canonical.address.v1",
+  "doc": "Canonical address (v1): mandatory attributes are the non-nullable fields",
+  "fields": [
+    {
+      "name": "address_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the address (mandatory)"
+    },
+    {
+      "name": "customer_id",
+      "type": "string",
+      "doc": "Identifier of the customer the address belongs to (mandatory)"
+    },
+    {
+      "name": "country",
+      "type": "string",
+      "doc": "ISO 3166-1 alpha-2 country code (mandatory)"
+    },
+    {
+      "name": "city",
+      "type": "string",
+      "doc": "City name (mandatory)"
+    },
+    {
+      "name": "postal_code",
+      "type": "string",
+      "doc": "Postal or ZIP code (mandatory)"
+    },
+    {
+      "name": "line1",
+      "type": "string",
+      "doc": "Street address, first line (mandatory)"
+    },
+    {
+      "name": "line2",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Street address, second line (optional)"
+    }
+  ]
+}

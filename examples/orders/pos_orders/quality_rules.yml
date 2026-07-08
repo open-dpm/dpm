@@ -1,0 +1,34 @@
+version: "1.0"
+
+rules:
+  - name: "order_id_not_null"
+    field: "order_id"
+    type: "not_null"
+    severity: "error"
+    message: "Order id is required"
+
+  - name: "order_id_unique"
+    field: "order_id"
+    type: "unique"
+    severity: "error"
+    message: "Order id must be unique"
+
+  - name: "total_amount_range"
+    field: "total_amount"
+    type: "range"
+    min: 0
+    severity: "error"
+    message: "Order total must be non-negative"
+
+  - name: "currency_format"
+    field: "currency"
+    type: "regex"
+    pattern: "^[A-Z]{3}$"
+    severity: "error"
+    message: "Currency must be an ISO 4217 code"
+
+  - name: "store_id_not_null"
+    field: "store_id"
+    type: "not_null"
+    severity: "error"
+    message: "Store id is required for in-store orders"

@@ -1,0 +1,53 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CANONICAL ENTITY: customer (v1) — DEPRECATED
+# ═══════════════════════════════════════════════════════════════════════════
+# The first canonical definition of a customer. Superseded by v2, which adds
+# `country` as a mandatory attribute. Kept alive during the migration window so
+# products pinned to customer@1 keep resolving until the sunset date.
+
+kind: "canonical_entity"
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "deprecated"  # draft | active | deprecated | retired
+
+metadata:
+  name: "customer"
+  namespace: "canonical"
+  display_name: "Customer (v1)"
+  description: |
+    Canonical definition of a customer of the online store — a person with an
+    account who can place orders. Mandatory attributes are the non-nullable
+    fields of the schema. Superseded by customer@2.
+
+  owner:
+    team: "data-architecture"
+    email: "data-architecture@example.com"
+    mattermost: "data-architecture"
+
+  tags:
+    - "canonical"
+    - "master-data"
+
+  created_at: "2026-01-10"
+  updated_at: "2026-06-01"
+  created_by: "data-architecture@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+# Migration metadata read by tooling when warning conformers.
+deprecation:
+  successor: "customer@2"
+  sunset_date: "2026-12-31"
+  migration_guide: "Add the mandatory `country` attribute, then repin to customer@2."
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-01-10"
+    author: "data-architecture@example.com"
+    changes:
+      - type: "initial"
+        description: "First canonical definition of the customer entity"
+    breaking: false

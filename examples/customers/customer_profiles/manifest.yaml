@@ -1,0 +1,65 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT: customers/customer_profiles
+# ═══════════════════════════════════════════════════════════════════════════
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "customer_profiles"
+  namespace: "customers"
+  data_category: "master_data"
+  pii: true
+  display_name: "Customer Profiles"
+  description: |
+    The golden record for customers of the online store: one row per customer
+    with identity, contact details and residence. Source of truth for who a
+    customer is.
+
+  owner:
+    team: "customer-data"
+    email: "customer-data@example.com"
+    mattermost: "customer-data"
+
+  tags:
+    - "customers"
+    - "master-data"
+
+  # Its rows ARE customers, so it conforms to the canonical customer entity.
+  conforms_to:
+    - entity: "customer@2"
+
+  created_at: "2026-06-05"
+  updated_at: "2026-06-05"
+  created_by: "customer-data@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+semantics:
+  file: "./semantics.yml"
+
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+sla:
+  file: "./sla.yml"
+
+lineage:
+  upstream:
+    - system: "Shop backend"
+      api: "https://shop.example.com/internal/customers"
+      extraction_method: api
+  downstream: []
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-06-05"
+    author: "customer-data@example.com"
+    changes:
+      - type: "initial"
+        description: "First version of the customer profiles product"
+    breaking: false

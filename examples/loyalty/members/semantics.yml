@@ -1,0 +1,27 @@
+version: "1.0"
+
+business_terms:
+  - name: "loyalty member"
+    definition: "A customer enrolled in the loyalty programme"
+    aliases:
+      - "member"
+    owner: "loyalty"
+
+interpretation:
+  grain: "one row per loyalty member"
+  time_basis: "created_at"
+  known_limitations:
+    - "Only customers who opted into loyalty appear here"
+
+typical_questions:
+  - "How many members are in each tier?"
+  - "What is the average points balance by country?"
+
+ai_hints:
+  default_time_field: "created_at"
+  default_grain: "month"
+  recommended_visualizations:
+    - "bar_chart"
+    - "table"
+  safe_aggregation_notes:
+    - "Count unique customer_id; never expose email or full_name in aggregates"

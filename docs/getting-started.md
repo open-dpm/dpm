@@ -9,7 +9,7 @@ pip install -e ".[dev]"
 ## Validate a manifest
 
 ```bash
-dpm validate examples/aviation/flights/manifest.yaml
+dpm validate examples/orders/orders/manifest.yaml
 dpm validate --all
 dpm validate-rules --all
 dpm governance --all
@@ -29,7 +29,7 @@ If a product publishes a shared business entity, declare it with
 
 ```bash
 dpm validate-conformance --all --registry-path examples/canonical
-dpm conformance-impact --entity aircraft_observation --version 1
+dpm conformance-impact --entity customer --version 1
 ```
 
 See [canonical-model.md](canonical-model.md) for the full workflow.

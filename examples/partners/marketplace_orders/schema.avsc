@@ -1,0 +1,47 @@
+{
+  "type": "record",
+  "name": "MarketplaceOrder",
+  "namespace": "partners.marketplace_orders",
+  "doc": "Orders from third-party marketplace partners (conforms to order@1)",
+  "fields": [
+    {
+      "name": "order_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the order"
+    },
+    {
+      "name": "customer_id",
+      "type": "string",
+      "doc": "Identifier of the customer who placed the order"
+    },
+    {
+      "name": "total_amount",
+      "type": "double",
+      "doc": "Order total in the order currency"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "doc": "ISO 4217 currency code, e.g. EUR"
+    },
+    {
+      "name": "ordered_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "When the order was placed on the marketplace, UTC milliseconds (canonical: created_at)"
+    },
+    {
+      "name": "seller_id",
+      "type": "string",
+      "doc": "Identifier of the marketplace seller"
+    },
+    {
+      "name": "status",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Order lifecycle status"
+    }
+  ]
+}

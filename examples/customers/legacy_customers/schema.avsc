@@ -1,0 +1,35 @@
+{
+  "type": "record",
+  "name": "LegacyCustomer",
+  "namespace": "customers.legacy_customers",
+  "doc": "Customer records imported from the legacy monolith (conforms to customer@1)",
+  "fields": [
+    {
+      "name": "customer_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the customer"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "pii": true,
+      "pii_category": "contact",
+      "doc": "Primary email address"
+    },
+    {
+      "name": "full_name",
+      "type": "string",
+      "pii": true,
+      "pii_category": "personal_data",
+      "doc": "Customer full name"
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "When the customer account was created, UTC milliseconds"
+    }
+  ]
+}

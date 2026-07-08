@@ -1,0 +1,39 @@
+{
+  "type": "record",
+  "name": "Product",
+  "namespace": "canonical.product.v1",
+  "doc": "Canonical product (v1): mandatory attributes are the non-nullable fields",
+  "fields": [
+    {
+      "name": "product_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the product (mandatory)"
+    },
+    {
+      "name": "sku",
+      "type": "string",
+      "doc": "Stock-keeping unit, unique in the catalog (mandatory)"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "Human-readable product name (mandatory)"
+    },
+    {
+      "name": "price",
+      "type": "double",
+      "doc": "List price in the product currency (mandatory)"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "doc": "ISO 4217 currency code, e.g. EUR (mandatory)"
+    },
+    {
+      "name": "category",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Catalog category, e.g. electronics (optional)"
+    }
+  ]
+}

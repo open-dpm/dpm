@@ -1,0 +1,68 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT: partners/marketplace_orders
+# ═══════════════════════════════════════════════════════════════════════════
+# Orders placed through third-party marketplace partners — a third channel that
+# still produces the canonical order@1. It renames the canonical `created_at`
+# to its physical `ordered_at`: three products, three field names, one entity.
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "marketplace_orders"
+  namespace: "partners"
+  data_category: "transactional_data"
+  pii: false
+  display_name: "Marketplace Orders"
+  description: |
+    Orders received from third-party marketplace partners: one row per order
+    with its total, currency and originating seller.
+
+  owner:
+    team: "partnerships"
+    email: "partnerships@example.com"
+    mattermost: "partnerships"
+
+  tags:
+    - "orders"
+    - "partners"
+
+  conforms_to:
+    - entity: "order@1"
+      rename:
+        created_at: "ordered_at"
+
+  created_at: "2026-04-10"
+  updated_at: "2026-04-10"
+  created_by: "partnerships@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+semantics:
+  file: "./semantics.yml"
+
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+sla:
+  file: "./sla.yml"
+
+lineage:
+  upstream:
+    - system: "Marketplace partners API"
+      api: "https://partners.example.com/api/orders"
+      extraction_method: api
+  downstream: []
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-04-10"
+    author: "partnerships@example.com"
+    changes:
+      - type: "initial"
+        description: "First version of the marketplace orders product"
+    breaking: false

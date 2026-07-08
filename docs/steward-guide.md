@@ -151,9 +151,9 @@ aircraft observations, …), the data-architecture team may define that entity i
 ```yaml
 metadata:
   conforms_to:
-    - entity: "aircraft_observation@1"   # pin the MAJOR version only
+    - entity: "order@1"                  # pin the MAJOR version only
       rename:
-        observed_at: "received_at"        # only where your field name differs
+        created_at: "placed_at"           # only where your field name differs
 ```
 
 The check then requires your schema to carry every **mandatory** attribute of that entity,
@@ -164,9 +164,10 @@ sunset): `data/dpm` → `docs/canonical-model.md`.
 
 ## If you get stuck
 
-- A reference to copy from: `data/dpm` → `examples/aviation/flights/`.
+- A reference to copy from: `data/dpm` → `examples/orders/orders/`.
 - What is checked and why: `data/dpm` → `docs/DATA_GOVERNANCE_SPEC.md`.
 - Connecting to a canonical model: `data/dpm` → `docs/canonical-model.md`.
+- Seeing the conformance graph (`dpm graph`): `data/dpm` → `docs/visualization.md`.
 
 ## One-line summary
 

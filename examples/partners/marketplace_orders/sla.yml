@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SLA: partners/marketplace_orders
+# ═══════════════════════════════════════════════════════════════════════════
+availability:
+  target: "99.0%"
+
+freshness:
+  max_age: "PT15M"
+  timestamp_field: "ordered_at"
+
+retention:
+  prod:
+    duration: "P7Y"
+    reason: "Financial records — statutory retention"
+  dlq:
+    duration: "P30D"
+    reason: "For investigating quality issues"
+
+quality:
+  max_dlq_rate_percent: 1.0
+  alert_dlq_rate_percent: 0.5
+
+escalation:
+  level_1:
+    team: "partnerships"
+    mattermost: "partnerships"
+    email: "partnerships@example.com"

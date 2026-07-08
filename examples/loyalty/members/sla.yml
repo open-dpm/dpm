@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SLA: loyalty/members
+# ═══════════════════════════════════════════════════════════════════════════
+availability:
+  target: "99.5%"
+
+freshness:
+  max_age: "PT1H"
+  timestamp_field: "created_at"
+
+retention:
+  prod:
+    duration: "P3Y"
+    reason: "Master data — retained for the loyalty relationship lifetime"
+  dlq:
+    duration: "P30D"
+    reason: "For investigating quality issues"
+
+quality:
+  max_dlq_rate_percent: 1.0
+  alert_dlq_rate_percent: 0.5
+
+escalation:
+  level_1:
+    team: "loyalty"
+    mattermost: "loyalty"
+    email: "loyalty@example.com"

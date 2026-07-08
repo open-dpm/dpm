@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SLA: customers/legacy_customers
+# ═══════════════════════════════════════════════════════════════════════════
+availability:
+  target: "99.0%"
+
+freshness:
+  max_age: "P1D"
+  timestamp_field: "created_at"
+
+retention:
+  prod:
+    duration: "P3Y"
+    reason: "Master data — retained for the customer relationship lifetime"
+  dlq:
+    duration: "P30D"
+    reason: "For investigating quality issues"
+
+quality:
+  max_dlq_rate_percent: 2.0
+  alert_dlq_rate_percent: 1.0
+
+escalation:
+  level_1:
+    team: "customer-data"
+    mattermost: "customer-data"
+    email: "customer-data@example.com"

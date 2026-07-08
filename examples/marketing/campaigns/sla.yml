@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SLA: marketing/campaigns
+# ═══════════════════════════════════════════════════════════════════════════
+availability:
+  target: "99.0%"
+
+freshness:
+  max_age: "P1D"
+  timestamp_field: "start_date"
+
+retention:
+  prod:
+    duration: "P2Y"
+    reason: "Analytical data — retained for year-over-year comparison"
+  dlq:
+    duration: "P30D"
+    reason: "For investigating quality issues"
+
+quality:
+  max_dlq_rate_percent: 3.0
+  alert_dlq_rate_percent: 1.5
+
+escalation:
+  level_1:
+    team: "marketing-analytics"
+    mattermost: "marketing-analytics"
+    email: "marketing-analytics@example.com"

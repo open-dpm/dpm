@@ -1,0 +1,30 @@
+version: "1.0"
+
+business_terms:
+  - name: "order"
+    definition: "A confirmed purchase request placed by a customer"
+    aliases:
+      - "purchase"
+    owner: "orders-platform"
+
+interpretation:
+  grain: "one row per order"
+  time_basis: "placed_at"
+  lifecycle:
+    description: "A row is created when an order is placed; status evolves as it is paid and shipped"
+    terminal_states:
+      - "cancelled"
+      - "delivered"
+
+typical_questions:
+  - "What is the daily order volume?"
+  - "What is the average order value by currency?"
+
+ai_hints:
+  default_time_field: "placed_at"
+  default_grain: "day"
+  recommended_visualizations:
+    - "line_chart"
+    - "table"
+  safe_aggregation_notes:
+    - "Sum total_amount only within a single currency"

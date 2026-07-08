@@ -1,0 +1,35 @@
+version: "1.0"
+
+rules:
+  - name: "customer_id_not_null"
+    field: "customer_id"
+    type: "not_null"
+    severity: "error"
+    message: "Customer id is required"
+
+  - name: "customer_id_unique"
+    field: "customer_id"
+    type: "unique"
+    severity: "error"
+    message: "Customer id must be unique"
+
+  - name: "email_format"
+    field: "email"
+    type: "format"
+    format_type: "email"
+    severity: "error"
+    message: "Email must be a valid email address"
+
+  - name: "tier_allowed"
+    field: "tier"
+    type: "regex"
+    pattern: "^(bronze|silver|gold|platinum)$"
+    severity: "error"
+    message: "Tier must be one of bronze/silver/gold/platinum"
+
+  - name: "points_range"
+    field: "points"
+    type: "range"
+    min: 0
+    severity: "error"
+    message: "Points balance must be non-negative"

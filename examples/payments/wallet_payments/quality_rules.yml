@@ -1,0 +1,34 @@
+version: "1.0"
+
+rules:
+  - name: "payment_id_not_null"
+    field: "payment_id"
+    type: "not_null"
+    severity: "error"
+    message: "Payment id is required"
+
+  - name: "payment_id_unique"
+    field: "payment_id"
+    type: "unique"
+    severity: "error"
+    message: "Payment id must be unique"
+
+  - name: "amount_range"
+    field: "amount"
+    type: "range"
+    min: 0
+    severity: "error"
+    message: "Payment amount must be non-negative"
+
+  - name: "status_allowed"
+    field: "status"
+    type: "regex"
+    pattern: "^(authorized|captured|failed|refunded)$"
+    severity: "error"
+    message: "Status must be one of authorized/captured/failed/refunded"
+
+  - name: "wallet_id_not_null"
+    field: "wallet_id"
+    type: "not_null"
+    severity: "error"
+    message: "Wallet id is required for wallet payments"

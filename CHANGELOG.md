@@ -21,7 +21,8 @@ Initial public release.
   `entity@major`
 - `kind`-aware validation: canonical entities skip the SLA / quality-rules / lineage / PII
   requirements that only apply to row-bearing data products
-- Example data product (`examples/aviation/flights`) conforming to a canonical entity
-  (`examples/canonical/aircraft_observation`), plus templates for new manifests and entities
+- Example data products modelling a small online store (customers, orders, catalog, payments,
+  marketing) conforming to a canonical registry (`examples/canonical/`), plus templates for
+  new manifests and entities
 - Docker image published to GHCR; reusable GitLab CI template and GitHub Actions workflow;
   ruff and mypy configuration

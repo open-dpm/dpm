@@ -1,0 +1,65 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT: payments/wallet_payments
+# ═══════════════════════════════════════════════════════════════════════════
+# Payments made from in-app wallet balances. A second payment source alongside
+# the card/PSP payments product, conforming to the same canonical payment@1.
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "wallet_payments"
+  namespace: "payments"
+  data_category: "transactional_data"
+  pii: false
+  display_name: "Wallet Payments"
+  description: |
+    Payments settled from a customer's in-app wallet balance: one row per
+    wallet payment with its amount, currency, outcome and wallet.
+
+  owner:
+    team: "payments"
+    email: "payments@example.com"
+    mattermost: "payments"
+
+  tags:
+    - "payments"
+    - "wallet"
+
+  conforms_to:
+    - entity: "payment@1"
+
+  created_at: "2026-04-05"
+  updated_at: "2026-04-05"
+  created_by: "payments@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+semantics:
+  file: "./semantics.yml"
+
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+sla:
+  file: "./sla.yml"
+
+lineage:
+  upstream:
+    - system: "Wallet service"
+      api: "https://wallet.example.com/api/payments"
+      extraction_method: api
+  downstream: []
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-04-05"
+    author: "payments@example.com"
+    changes:
+      - type: "initial"
+        description: "First version of the wallet payments product"
+    breaking: false

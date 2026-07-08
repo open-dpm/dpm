@@ -1,0 +1,39 @@
+{
+  "type": "record",
+  "name": "CatalogProduct",
+  "namespace": "catalog.products",
+  "doc": "Sellable catalog products for the online store (conforms to product@1)",
+  "fields": [
+    {
+      "name": "product_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the product"
+    },
+    {
+      "name": "sku",
+      "type": "string",
+      "doc": "Stock-keeping unit, unique in the catalog"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "Human-readable product name"
+    },
+    {
+      "name": "price",
+      "type": "double",
+      "doc": "List price in the product currency"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "doc": "ISO 4217 currency code, e.g. EUR"
+    },
+    {
+      "name": "category",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Catalog category, e.g. electronics"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+version: "1.0"
+
+business_terms:
+  - name: "marketplace listing"
+    definition: "A product offered by a third-party marketplace seller"
+    aliases:
+      - "seller listing"
+    owner: "partnerships"
+
+interpretation:
+  grain: "one row per marketplace listing"
+  time_basis: "none"
+  known_limitations:
+    - "A listing may map to the same physical product as a first-party catalog entry"
+
+typical_questions:
+  - "How many active listings per seller?"
+  - "What is the average listing price by category?"
+
+ai_hints:
+  default_grain: "none"
+  recommended_visualizations:
+    - "table"
+    - "bar_chart"

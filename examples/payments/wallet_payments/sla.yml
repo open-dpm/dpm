@@ -1,0 +1,28 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SLA: payments/wallet_payments
+# ═══════════════════════════════════════════════════════════════════════════
+availability:
+  target: "99.95%"
+
+freshness:
+  max_age: "PT2M"
+  timestamp_field: "created_at"
+  alert_threshold: "PT1M"
+
+retention:
+  prod:
+    duration: "P7Y"
+    reason: "Financial records — statutory retention"
+  dlq:
+    duration: "P90D"
+    reason: "For investigating quality issues and reconciliation"
+
+quality:
+  max_dlq_rate_percent: 0.2
+  alert_dlq_rate_percent: 0.1
+
+escalation:
+  level_1:
+    team: "payments"
+    mattermost: "payments"
+    email: "payments@example.com"

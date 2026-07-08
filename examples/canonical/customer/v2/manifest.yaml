@@ -1,0 +1,55 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CANONICAL ENTITY: customer (v2)
+# ═══════════════════════════════════════════════════════════════════════════
+# The current canonical definition of a customer. Adds `country` as a mandatory
+# attribute compared to v1 (a breaking change → new major). Products publishing
+# customers should conform to customer@2.
+
+kind: "canonical_entity"
+
+spec_version: "1.0.0"
+manifest_version: "2.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "customer"
+  namespace: "canonical"
+  display_name: "Customer"
+  description: |
+    Canonical definition of a customer of the online store — a person with an
+    account who can place orders. Mandatory attributes are the non-nullable
+    fields of the schema below; any product whose rows are customers must carry
+    them.
+
+  owner:
+    team: "data-architecture"
+    email: "data-architecture@example.com"
+    mattermost: "data-architecture"
+
+  tags:
+    - "canonical"
+    - "master-data"
+
+  created_at: "2026-06-01"
+  updated_at: "2026-06-01"
+  created_by: "data-architecture@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+changelog:
+  - version: "2.0.0"
+    date: "2026-06-01"
+    author: "data-architecture@example.com"
+    changes:
+      - type: "breaking"
+        description: "Add mandatory `country` attribute; supersedes customer@1"
+    breaking: true
+  - version: "1.0.0"
+    date: "2026-01-10"
+    author: "data-architecture@example.com"
+    changes:
+      - type: "initial"
+        description: "First canonical definition of the customer entity"
+    breaking: false

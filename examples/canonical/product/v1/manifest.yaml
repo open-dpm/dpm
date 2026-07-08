@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CANONICAL ENTITY: product (v1)
+# ═══════════════════════════════════════════════════════════════════════════
+# Canonical definition of a catalog product (an item that can be sold).
+
+kind: "canonical_entity"
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "product"
+  namespace: "canonical"
+  display_name: "Product"
+  description: |
+    Canonical definition of a catalog product: one row is one sellable item.
+    Products whose rows are catalog items conform to this entity.
+
+  owner:
+    team: "data-architecture"
+    email: "data-architecture@example.com"
+    mattermost: "data-architecture"
+
+  tags:
+    - "canonical"
+    - "master-data"
+
+  created_at: "2026-02-15"
+  updated_at: "2026-02-15"
+  created_by: "data-architecture@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-02-15"
+    author: "data-architecture@example.com"
+    changes:
+      - type: "initial"
+        description: "First canonical definition of the product entity"
+    breaking: false

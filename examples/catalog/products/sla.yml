@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SLA: catalog/products
+# ═══════════════════════════════════════════════════════════════════════════
+availability:
+  target: "99.5%"
+
+freshness:
+  max_age: "PT1H"
+  timestamp_field: "none"
+
+retention:
+  prod:
+    duration: "P5Y"
+    reason: "Master data — retained while the catalog is active"
+  dlq:
+    duration: "P30D"
+    reason: "For investigating quality issues"
+
+quality:
+  max_dlq_rate_percent: 1.0
+  alert_dlq_rate_percent: 0.5
+
+escalation:
+  level_1:
+    team: "catalog"
+    mattermost: "catalog"
+    email: "catalog@example.com"

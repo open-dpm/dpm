@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT: orders/pos_orders
+# ═══════════════════════════════════════════════════════════════════════════
+# In-store point-of-sale orders. A different channel and system from the web
+# orders product, but its rows are still orders — so it conforms to the SAME
+# canonical order@1. Note it carries `created_at` directly (no rename).
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "pos_orders"
+  namespace: "orders"
+  data_category: "transactional_data"
+  pii: false
+  display_name: "Point-of-Sale Orders"
+  description: |
+    Orders created at in-store point-of-sale terminals: one row per in-store
+    order with its total, currency and store.
+
+  owner:
+    team: "retail-stores"
+    email: "retail-stores@example.com"
+    mattermost: "retail-stores"
+
+  tags:
+    - "orders"
+    - "retail"
+
+  conforms_to:
+    - entity: "order@1"
+
+  created_at: "2026-03-15"
+  updated_at: "2026-03-15"
+  created_by: "retail-stores@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+semantics:
+  file: "./semantics.yml"
+
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+sla:
+  file: "./sla.yml"
+
+lineage:
+  upstream:
+    - system: "POS terminals"
+      api: "https://pos.example.com/api/orders"
+      extraction_method: batch
+  downstream: []
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-03-15"
+    author: "retail-stores@example.com"
+    changes:
+      - type: "initial"
+        description: "First version of the point-of-sale orders product"
+    breaking: false

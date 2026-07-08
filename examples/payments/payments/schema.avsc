@@ -1,0 +1,47 @@
+{
+  "type": "record",
+  "name": "Payment",
+  "namespace": "payments.payments",
+  "doc": "Payments processed against orders (conforms to payment@1)",
+  "fields": [
+    {
+      "name": "payment_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the payment"
+    },
+    {
+      "name": "order_id",
+      "type": "string",
+      "doc": "Identifier of the order being paid"
+    },
+    {
+      "name": "amount",
+      "type": "double",
+      "doc": "Payment amount in the payment currency"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "doc": "ISO 4217 currency code, e.g. EUR"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "Payment outcome: authorized/captured/failed/refunded"
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "When the payment was processed, UTC milliseconds"
+    },
+    {
+      "name": "method",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Payment method, e.g. card/paypal"
+    }
+  ]
+}

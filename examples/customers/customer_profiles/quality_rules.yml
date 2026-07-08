@@ -1,0 +1,40 @@
+version: "1.0"
+
+rules:
+  - name: "customer_id_not_null"
+    field: "customer_id"
+    type: "not_null"
+    severity: "error"
+    message: "Customer id is required"
+
+  - name: "customer_id_unique"
+    field: "customer_id"
+    type: "unique"
+    severity: "error"
+    message: "Customer id must be unique"
+
+  - name: "email_not_null"
+    field: "email"
+    type: "not_null"
+    severity: "error"
+    message: "Email is required"
+
+  - name: "email_format"
+    field: "email"
+    type: "format"
+    format_type: "email"
+    severity: "error"
+    message: "Email must be a valid email address"
+
+  - name: "country_format"
+    field: "country"
+    type: "regex"
+    pattern: "^[A-Z]{2}$"
+    severity: "error"
+    message: "Country must be an ISO 3166-1 alpha-2 code"
+
+  - name: "created_at_not_null"
+    field: "created_at"
+    type: "not_null"
+    severity: "error"
+    message: "Creation time is required"

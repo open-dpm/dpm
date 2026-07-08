@@ -1,0 +1,63 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT: payments/payments
+# ═══════════════════════════════════════════════════════════════════════════
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "payments"
+  namespace: "payments"
+  data_category: "transactional_data"
+  pii: false
+  display_name: "Payments"
+  description: |
+    Payments processed against orders: one row per payment attempt with its
+    amount, currency, outcome and time. No cardholder data is stored here.
+
+  owner:
+    team: "payments"
+    email: "payments@example.com"
+    mattermost: "payments"
+
+  tags:
+    - "payments"
+    - "transactional"
+
+  conforms_to:
+    - entity: "payment@1"
+
+  created_at: "2026-03-05"
+  updated_at: "2026-03-05"
+  created_by: "payments@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+semantics:
+  file: "./semantics.yml"
+
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+sla:
+  file: "./sla.yml"
+
+lineage:
+  upstream:
+    - system: "Payment gateway"
+      api: "https://psp.example.com/api/payments"
+      extraction_method: api
+  downstream: []
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-03-05"
+    author: "payments@example.com"
+    changes:
+      - type: "initial"
+        description: "First version of the payments product"
+    breaking: false

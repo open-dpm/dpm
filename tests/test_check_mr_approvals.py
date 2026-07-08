@@ -85,17 +85,17 @@ def test_main_no_changed_files(repo_root, mocker):
 
 def test_main_dry_run_pass(repo_root, mocker):
     mocker.patch.object(
-        mod, "get_changed_files", return_value=["examples/aviation/flights/sla.yml"]
+        mod, "get_changed_files", return_value=["examples/orders/orders/sla.yml"]
     )
     rc = mod.main(
-        ["--approved-users", "platform-team", "--repo-root", str(repo_root)]
+        ["--approved-users", "orders-platform", "--repo-root", str(repo_root)]
     )
     assert rc == 0
 
 
 def test_main_dry_run_missing_approval(repo_root, mocker):
     mocker.patch.object(
-        mod, "get_changed_files", return_value=["examples/aviation/flights/sla.yml"]
+        mod, "get_changed_files", return_value=["examples/orders/orders/sla.yml"]
     )
     rc = mod.main(["--approved-users", "", "--repo-root", str(repo_root)])
     assert rc == 1

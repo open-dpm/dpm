@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT: loyalty/members
+# ═══════════════════════════════════════════════════════════════════════════
+# A second product whose rows ARE customers — loyalty-program members. It comes
+# from a different domain than customer_profiles yet conforms to the SAME
+# canonical customer@2: that shared shape is exactly what the EDM buys you.
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "members"
+  namespace: "loyalty"
+  data_category: "master_data"
+  pii: true
+  display_name: "Loyalty Members"
+  description: |
+    Customers enrolled in the loyalty programme: one row per member with their
+    tier and points, on top of the shared canonical customer attributes.
+
+  owner:
+    team: "loyalty"
+    email: "loyalty@example.com"
+    mattermost: "loyalty"
+
+  tags:
+    - "loyalty"
+    - "customers"
+
+  conforms_to:
+    - entity: "customer@2"
+
+  created_at: "2026-06-10"
+  updated_at: "2026-06-10"
+  created_by: "loyalty@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+semantics:
+  file: "./semantics.yml"
+
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+sla:
+  file: "./sla.yml"
+
+lineage:
+  upstream:
+    - system: "Loyalty platform"
+      api: "https://loyalty.example.com/api/members"
+      extraction_method: api
+  downstream: []
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-06-10"
+    author: "loyalty@example.com"
+    changes:
+      - type: "initial"
+        description: "First version of the loyalty members product"
+    breaking: false

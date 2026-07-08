@@ -1,0 +1,45 @@
+{
+  "type": "record",
+  "name": "Campaign",
+  "namespace": "marketing.campaigns",
+  "doc": "Marketing campaigns across channels (outside the enterprise data model)",
+  "fields": [
+    {
+      "name": "campaign_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the campaign"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "Campaign name"
+    },
+    {
+      "name": "channel",
+      "type": "string",
+      "doc": "Marketing channel, e.g. email/search/social"
+    },
+    {
+      "name": "budget",
+      "type": "double",
+      "doc": "Total campaign budget in EUR"
+    },
+    {
+      "name": "start_date",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Campaign start, UTC milliseconds"
+    },
+    {
+      "name": "end_date",
+      "type": ["null", {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }],
+      "default": null,
+      "doc": "Campaign end, UTC milliseconds (optional, open-ended if null)"
+    }
+  ]
+}

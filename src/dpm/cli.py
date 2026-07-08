@@ -58,6 +58,14 @@ def _build_parser() -> argparse.ArgumentParser:
     p_impact.add_argument("--base-path", default=".", help="Base path to scan")
     p_impact.add_argument("--output", help="Output JSON report path")
 
+    p_graph = sub.add_parser(
+        "graph", help="Render the conformance graph (products <-> canonical entities)"
+    )
+    p_graph.add_argument("--base-path", default=".", help="Base path to scan for manifests")
+    p_graph.add_argument("--registry-path", help="Path to the canonical registry (optional)")
+    p_graph.add_argument("--format", choices=["mermaid", "json"], default="mermaid")
+    p_graph.add_argument("--output", help="Write output to a file instead of stdout")
+
     return parser
 
 
@@ -152,6 +160,16 @@ def main(argv: list[str] | None = None) -> None:
         if args.output:
             sys.argv += ["--output", args.output]
         ci.main()
+
+    elif args.command == "graph":
+        from dpm import graph
+
+        sys.argv = ["graph", "--base-path", args.base_path, "--format", args.format]
+        if args.registry_path:
+            sys.argv += ["--registry-path", args.registry_path]
+        if args.output:
+            sys.argv += ["--output", args.output]
+        graph.main()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,28 @@
+version: "1.0"
+
+business_terms:
+  - name: "marketplace order"
+    definition: "An order placed through a third-party marketplace partner"
+    aliases:
+      - "partner order"
+    owner: "partnerships"
+
+interpretation:
+  grain: "one row per marketplace order"
+  time_basis: "ordered_at"
+  lifecycle:
+    description: "A row is created when the partner reports a confirmed order"
+    terminal_states:
+      - "cancelled"
+      - "delivered"
+
+typical_questions:
+  - "What is the daily order volume by seller?"
+  - "What share of orders comes from marketplace partners?"
+
+ai_hints:
+  default_time_field: "ordered_at"
+  default_grain: "day"
+  recommended_visualizations:
+    - "line_chart"
+    - "table"

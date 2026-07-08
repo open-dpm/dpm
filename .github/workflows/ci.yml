@@ -39,4 +39,4 @@ jobs:
       - name: Pytest
         run: pytest
       - name: Validate example manifest
-        run: dpm validate examples/aviation/flights/manifest.yaml
+        run: dpm validate examples/orders/orders/manifest.yaml

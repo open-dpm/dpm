@@ -25,9 +25,9 @@ def test_parse_codeowners_file() -> None:
 
 def test_find_codeowners_for_manifest_file(repo_root: Path) -> None:
     path = find_codeowners_for_file(
-        "examples/aviation/flights/schema.avsc", repo_root
+        "examples/orders/orders/schema.avsc", repo_root
     )
-    assert path == repo_root / "examples/aviation/flights/CODEOWNERS"
+    assert path == repo_root / "examples/orders/orders/CODEOWNERS"
 
 
 def test_find_codeowners_for_ci_file(repo_root: Path) -> None:
@@ -37,17 +37,17 @@ def test_find_codeowners_for_ci_file(repo_root: Path) -> None:
 
 def test_collect_required_scopes_single_manifest(repo_root: Path) -> None:
     scopes = collect_required_scopes(
-        ["examples/aviation/flights/sla.yml"], repo_root
+        ["examples/orders/orders/sla.yml"], repo_root
     )
     assert len(scopes) == 1
     scope = next(iter(scopes.values()))
-    assert "platform-team" in scope.handles
+    assert "orders-platform" in scope.handles
 
 
 def test_collect_required_scopes_multiple_manifests(repo_root: Path) -> None:
     scopes = collect_required_scopes(
         [
-            "examples/aviation/flights/sla.yml",
+            "examples/orders/orders/sla.yml",
             "src/dpm/validators/validate_manifest.py",
         ],
         repo_root,
@@ -57,24 +57,24 @@ def test_collect_required_scopes_multiple_manifests(repo_root: Path) -> None:
 
 def test_scope_satisfied_by_username(repo_root: Path) -> None:
     scope = load_codeowners_scope(
-        repo_root / "examples/aviation/flights/CODEOWNERS"
+        repo_root / "examples/orders/orders/CODEOWNERS"
     )
     assert scope is not None
-    assert scope_is_satisfied(scope, {"platform-team"}, {})
+    assert scope_is_satisfied(scope, {"orders-platform"}, {})
 
 
 def test_scope_satisfied_by_group_member(repo_root: Path) -> None:
     scope = load_codeowners_scope(
-        repo_root / "examples/aviation/flights/CODEOWNERS"
+        repo_root / "examples/orders/orders/CODEOWNERS"
     )
     assert scope is not None
-    group_members = {"platform-team": {"bob"}}
+    group_members = {"orders-platform": {"bob"}}
     assert scope_is_satisfied(scope, {"bob"}, group_members)
 
 
 def test_find_unsatisfied_scopes(repo_root: Path) -> None:
     unsatisfied = find_unsatisfied_scopes(
-        ["examples/aviation/flights/schema.avsc"],
+        ["examples/orders/orders/schema.avsc"],
         repo_root,
         approved_usernames=set(),
         group_member_usernames={},

@@ -22,7 +22,7 @@ Exit codes:
     1 - Conformance errors found
 
 Usage:
-    python validate_conformance.py examples/aviation/flights/manifest.yaml --registry-path examples/canonical
+    python validate_conformance.py examples/orders/orders/manifest.yaml --registry-path examples/canonical
     python validate_conformance.py --all --base-path . --registry-path examples/canonical
 """
 

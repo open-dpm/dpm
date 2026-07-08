@@ -1,0 +1,27 @@
+version: "1.0"
+
+business_terms:
+  - name: "pos order"
+    definition: "An order created at an in-store point-of-sale terminal"
+    aliases:
+      - "in-store order"
+    owner: "retail-stores"
+
+interpretation:
+  grain: "one row per in-store order"
+  time_basis: "created_at"
+  lifecycle:
+    description: "A row is created when the sale is completed at the till"
+    terminal_states:
+      - "refunded"
+
+typical_questions:
+  - "What is the daily in-store order volume by store?"
+  - "What is the average basket value per store?"
+
+ai_hints:
+  default_time_field: "created_at"
+  default_grain: "day"
+  recommended_visualizations:
+    - "line_chart"
+    - "table"

@@ -82,15 +82,15 @@ class TestGetManifestDirFromFile:
     """Tests for resolving the manifest directory from a file path."""
 
     def test_valid_path(self):
-        result = get_manifest_dir_from_file("examples/aviation/flights/schema.avsc")
-        assert result == "examples/aviation/flights"
+        result = get_manifest_dir_from_file("examples/orders/orders/schema.avsc")
+        assert result == "examples/orders/orders"
 
     def test_manifest_yaml(self):
-        result = get_manifest_dir_from_file("examples/aviation/flights/manifest.yaml")
-        assert result == "examples/aviation/flights"
+        result = get_manifest_dir_from_file("examples/orders/orders/manifest.yaml")
+        assert result == "examples/orders/orders"
 
     def test_short_path(self):
-        result = get_manifest_dir_from_file("examples/aviation")
+        result = get_manifest_dir_from_file("examples/orders")
         assert result is None
 
     def test_non_domains_path(self):

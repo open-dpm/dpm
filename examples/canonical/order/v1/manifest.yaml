@@ -1,0 +1,46 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CANONICAL ENTITY: order (v1)
+# ═══════════════════════════════════════════════════════════════════════════
+# Canonical definition of a customer order. Mandatory attributes are the
+# non-nullable fields of the schema.
+
+kind: "canonical_entity"
+
+spec_version: "1.0.0"
+manifest_version: "1.0.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "order"
+  namespace: "canonical"
+  display_name: "Order"
+  description: |
+    Canonical definition of an order placed by a customer in the online store:
+    one row is one order at the moment it is placed. Products whose rows are
+    orders conform to this entity.
+
+  owner:
+    team: "data-architecture"
+    email: "data-architecture@example.com"
+    mattermost: "data-architecture"
+
+  tags:
+    - "canonical"
+    - "transactional-data"
+
+  created_at: "2026-02-15"
+  updated_at: "2026-02-15"
+  created_by: "data-architecture@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-02-15"
+    author: "data-architecture@example.com"
+    changes:
+      - type: "initial"
+        description: "First canonical definition of the order entity"
+    breaking: false

@@ -1,0 +1,31 @@
+version: "1.0"
+
+business_terms:
+  - name: "payment"
+    definition: "A single payment attempt against an order"
+    aliases:
+      - "transaction"
+    owner: "payments"
+
+interpretation:
+  grain: "one row per payment attempt"
+  time_basis: "created_at"
+  lifecycle:
+    description: "A row is created for each attempt; refunds are separate rows"
+    terminal_states:
+      - "captured"
+      - "failed"
+      - "refunded"
+
+typical_questions:
+  - "What is the payment success rate?"
+  - "What is the daily captured volume by currency?"
+
+ai_hints:
+  default_time_field: "created_at"
+  default_grain: "day"
+  recommended_visualizations:
+    - "line_chart"
+    - "table"
+  safe_aggregation_notes:
+    - "Sum amount only within a single currency and status"

@@ -1,0 +1,42 @@
+{
+  "type": "record",
+  "name": "Customer",
+  "namespace": "canonical.customer.v2",
+  "doc": "Canonical customer (v2): mandatory attributes are the non-nullable fields",
+  "fields": [
+    {
+      "name": "customer_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the customer (mandatory)"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "doc": "Primary email address (mandatory)"
+    },
+    {
+      "name": "full_name",
+      "type": "string",
+      "doc": "Customer full name (mandatory)"
+    },
+    {
+      "name": "country",
+      "type": "string",
+      "doc": "ISO 3166-1 alpha-2 country code of residence (mandatory, new in v2)"
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "When the customer account was created, UTC milliseconds (mandatory)"
+    },
+    {
+      "name": "phone",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Phone number in E.164 format (optional)"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA PRODUCT: catalog/products
+# ═══════════════════════════════════════════════════════════════════════════
+
+spec_version: "1.0.0"
+manifest_version: "1.1.0"
+status: "active"  # draft | active | deprecated | retired
+
+metadata:
+  name: "products"
+  namespace: "catalog"
+  data_category: "master_data"
+  pii: false
+  display_name: "Catalog Products"
+  description: |
+    The sellable catalog of the online store: one row per product with its SKU,
+    name, price and currency.
+
+  owner:
+    team: "catalog"
+    email: "catalog@example.com"
+    mattermost: "catalog"
+
+  tags:
+    - "catalog"
+    - "master-data"
+
+  conforms_to:
+    - entity: "product@1"
+
+  created_at: "2026-02-20"
+  updated_at: "2026-05-10"
+  created_by: "catalog@example.com"
+
+schema:
+  file: "./schema.avsc"
+  format: "avro"
+
+semantics:
+  file: "./semantics.yml"
+
+quality_rules:
+  file: "./quality_rules.yml"
+  enabled: true
+
+sla:
+  file: "./sla.yml"
+
+lineage:
+  upstream:
+    - system: "Product Information Management"
+      api: "https://pim.example.com/api/products"
+      extraction_method: api
+  downstream: []
+
+changelog:
+  - version: "1.1.0"
+    date: "2026-05-10"
+    author: "catalog@example.com"
+    changes:
+      - type: "improvement"
+        description: "Add optional category attribute"
+    breaking: false
+  - version: "1.0.0"
+    date: "2026-02-20"
+    author: "catalog@example.com"
+    changes:
+      - type: "initial"
+        description: "First version of the catalog products product"
+    breaking: false

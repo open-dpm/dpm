@@ -45,9 +45,9 @@ In the product manifest:
 ```yaml
 metadata:
   conforms_to:
-    - entity: "aircraft_observation@1"   # pin the MAJOR version only
+    - entity: "order@1"                  # pin the MAJOR version only
       rename:
-        observed_at: "received_at"       # canonical attribute -> physical field
+        created_at: "placed_at"          # canonical attribute -> physical field
 ```
 
 - Attributes match **by name** by default; use `rename` only where the physical
@@ -88,10 +88,10 @@ adopt it, then promote it to mandatory in a later major.)
 Before a major bump or a sunset, list the conformers so you can notify them:
 
 ```bash
-dpm conformance-impact --entity aircraft_observation --version 1 --base-path .
+dpm conformance-impact --entity customer --version 1 --base-path .
 ```
 
-This scans manifests for `conforms_to: aircraft_observation@1` and prints each
+This scans manifests for `conforms_to: customer@1` and prints each
 product with its owner contact.
 
 > **Limitation.** The list is only as complete as the manifests visible under

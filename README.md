@@ -57,8 +57,8 @@ Beyond each product's own contract, DPM can tie products to a shared **Enterpris
 ```yaml
 metadata:
   conforms_to:
-    - entity: "aircraft_observation@1"     # pin the MAJOR version
-      rename: { observed_at: "received_at" }  # only where field names differ
+    - entity: "order@1"                     # pin the MAJOR version
+      rename: { created_at: "placed_at" }   # only where field names differ
 ```
 
 CI then fails if the product's schema is missing a mandatory canonical attribute, or its type is incompatible or nullable. A product without `conforms_to` is outside the EDM and is not checked. This is conformance to a shared entity model (the DMBOK Enterprise Data Model) — distinct from foreign keys between rows. See [docs/canonical-model.md](docs/canonical-model.md).
@@ -72,7 +72,7 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 
 # Validate example manifest
-dpm validate examples/aviation/flights/manifest.yaml
+dpm validate examples/orders/orders/manifest.yaml
 
 # Run tests
 pytest
@@ -83,7 +83,7 @@ pytest
 Each data product lives in `examples/{namespace}/{entity}/`:
 
 ```text
-examples/aviation/flights/
+examples/orders/orders/
 ├── manifest.yaml          # Main index: metadata, version, links
 ├── schema.avsc            # Avro schema
 ├── semantics.yml          # Business meaning, AI/RAG hints
@@ -105,9 +105,11 @@ examples/aviation/flights/
 | `dpm suggest-version` | Suggest semver bump |
 | `dpm validate-conformance` | Check products conform to canonical entities (EDM) |
 | `dpm conformance-impact` | List products conforming to an `entity@major` |
+| `dpm graph` | Render the conformance graph (products ↔ canonical entities) as Mermaid/JSON |
 
 The rules these commands enforce are documented in [docs/DATA_GOVERNANCE_SPEC.md](docs/DATA_GOVERNANCE_SPEC.md).
 Connecting contracts to a canonical / Enterprise Data Model is described in [docs/canonical-model.md](docs/canonical-model.md).
+Visualizing that model is described in [docs/visualization.md](docs/visualization.md).
 
 ## CI integration
 

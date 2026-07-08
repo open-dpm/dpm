@@ -1,0 +1,28 @@
+version: "1.0"
+
+rules:
+  - name: "campaign_id_not_null"
+    field: "campaign_id"
+    type: "not_null"
+    severity: "error"
+    message: "Campaign id is required"
+
+  - name: "campaign_id_unique"
+    field: "campaign_id"
+    type: "unique"
+    severity: "error"
+    message: "Campaign id must be unique"
+
+  - name: "channel_allowed"
+    field: "channel"
+    type: "regex"
+    pattern: "^(email|search|social|display|affiliate)$"
+    severity: "warning"
+    message: "Channel should be one of email/search/social/display/affiliate"
+
+  - name: "budget_range"
+    field: "budget"
+    type: "range"
+    min: 0
+    severity: "error"
+    message: "Budget must be non-negative"

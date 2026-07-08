@@ -1,0 +1,23 @@
+version: "1.0"
+
+business_terms:
+  - name: "legacy customer"
+    definition: "A customer record originating from the pre-migration monolith"
+    aliases:
+      - "imported customer"
+    owner: "customer-data"
+
+interpretation:
+  grain: "one row per legacy customer"
+  time_basis: "created_at"
+  known_limitations:
+    - "No residence country: this product predates customer@2"
+
+typical_questions:
+  - "How many legacy customers are still active?"
+
+ai_hints:
+  default_time_field: "created_at"
+  default_grain: "month"
+  recommended_visualizations:
+    - "table"

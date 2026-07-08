@@ -1,0 +1,44 @@
+{
+  "type": "record",
+  "name": "MarketplaceListing",
+  "namespace": "partners.marketplace_listings",
+  "doc": "Third-party seller product listings (conforms to product@1)",
+  "fields": [
+    {
+      "name": "product_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the product"
+    },
+    {
+      "name": "sku",
+      "type": "string",
+      "doc": "Stock-keeping unit, unique per seller"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "Human-readable product name"
+    },
+    {
+      "name": "price",
+      "type": "double",
+      "doc": "Listing price in the product currency"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "doc": "ISO 4217 currency code, e.g. EUR"
+    },
+    {
+      "name": "seller_id",
+      "type": "string",
+      "doc": "Identifier of the marketplace seller"
+    },
+    {
+      "name": "category",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Catalog category, e.g. electronics"
+    }
+  ]
+}

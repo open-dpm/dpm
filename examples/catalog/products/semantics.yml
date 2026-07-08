@@ -1,0 +1,25 @@
+version: "1.0"
+
+business_terms:
+  - name: "product"
+    definition: "A sellable item in the store catalog"
+    aliases:
+      - "item"
+      - "sku"
+    owner: "catalog"
+
+interpretation:
+  grain: "one row per catalog product"
+  time_basis: "none"
+  known_limitations:
+    - "Reflects the current catalog, not price history"
+
+typical_questions:
+  - "How many active products are in the catalog?"
+  - "What is the average price by category?"
+
+ai_hints:
+  default_grain: "none"
+  recommended_visualizations:
+    - "table"
+    - "bar_chart"

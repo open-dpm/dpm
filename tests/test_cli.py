@@ -41,6 +41,7 @@ def _preserve_argv():
             ["conformance-impact", "--entity", "customer", "--version", "1"],
             "dpm.validators.conformance_impact.main",
         ),
+        (["graph"], "dpm.graph.main"),
     ],
 )
 def test_cli_dispatches_to_subcommand(argv, target, mocker):
@@ -97,4 +98,15 @@ def test_cli_validate_forwards_json_output(mocker):
     cli.main(["validate", "--all", "--json-output", "out.json"])
     entry.assert_called_once()
     assert "--json-output" in sys.argv
+    assert "out.json" in sys.argv
+
+
+def test_cli_graph_forwards_format_and_output(mocker):
+    """graph forwards --format and --output to the underlying module argv."""
+    entry = mocker.patch("dpm.graph.main")
+    cli.main(["graph", "--format", "json", "--output", "out.json"])
+    entry.assert_called_once()
+    assert "--format" in sys.argv
+    assert "json" in sys.argv
+    assert "--output" in sys.argv
     assert "out.json" in sys.argv

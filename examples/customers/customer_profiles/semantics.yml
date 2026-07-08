@@ -1,0 +1,32 @@
+version: "1.0"
+
+business_terms:
+  - name: "customer"
+    definition: "A person with an account in the online store who can place orders"
+    aliases:
+      - "client"
+      - "shopper"
+    owner: "customer-data"
+
+interpretation:
+  grain: "one row per customer"
+  time_basis: "created_at"
+  lifecycle:
+    description: "A row exists from account creation; profile fields are updated in place"
+    terminal_states:
+      - "closed"
+  known_limitations:
+    - "Reflects the current profile, not a full history of changes"
+
+typical_questions:
+  - "How many customers signed up last month?"
+  - "How many customers do we have per country?"
+
+ai_hints:
+  default_time_field: "created_at"
+  default_grain: "day"
+  recommended_visualizations:
+    - "table"
+    - "bar_chart"
+  safe_aggregation_notes:
+    - "Count unique customer_id values; never expose email or full_name in aggregates"

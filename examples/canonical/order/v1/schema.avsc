@@ -1,0 +1,42 @@
+{
+  "type": "record",
+  "name": "Order",
+  "namespace": "canonical.order.v1",
+  "doc": "Canonical order (v1): mandatory attributes are the non-nullable fields",
+  "fields": [
+    {
+      "name": "order_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the order (mandatory)"
+    },
+    {
+      "name": "customer_id",
+      "type": "string",
+      "doc": "Identifier of the customer who placed the order (mandatory)"
+    },
+    {
+      "name": "total_amount",
+      "type": "double",
+      "doc": "Order total in the order currency (mandatory)"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "doc": "ISO 4217 currency code, e.g. EUR (mandatory)"
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "When the order was placed, UTC milliseconds (mandatory)"
+    },
+    {
+      "name": "status",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Order lifecycle status, e.g. placed/paid/shipped (optional)"
+    }
+  ]
+}

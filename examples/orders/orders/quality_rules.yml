@@ -1,0 +1,40 @@
+version: "1.0"
+
+rules:
+  - name: "order_id_not_null"
+    field: "order_id"
+    type: "not_null"
+    severity: "error"
+    message: "Order id is required"
+
+  - name: "order_id_unique"
+    field: "order_id"
+    type: "unique"
+    severity: "error"
+    message: "Order id must be unique"
+
+  - name: "customer_id_not_null"
+    field: "customer_id"
+    type: "not_null"
+    severity: "error"
+    message: "Customer id is required"
+
+  - name: "total_amount_range"
+    field: "total_amount"
+    type: "range"
+    min: 0
+    severity: "error"
+    message: "Order total must be non-negative"
+
+  - name: "currency_format"
+    field: "currency"
+    type: "regex"
+    pattern: "^[A-Z]{3}$"
+    severity: "error"
+    message: "Currency must be an ISO 4217 code"
+
+  - name: "placed_at_not_null"
+    field: "placed_at"
+    type: "not_null"
+    severity: "error"
+    message: "Order placement time is required"

@@ -1,0 +1,34 @@
+version: "1.0"
+
+rules:
+  - name: "product_id_not_null"
+    field: "product_id"
+    type: "not_null"
+    severity: "error"
+    message: "Product id is required"
+
+  - name: "name_not_null"
+    field: "name"
+    type: "not_null"
+    severity: "error"
+    message: "Product name is required"
+
+  - name: "price_range"
+    field: "price"
+    type: "range"
+    min: 0
+    severity: "error"
+    message: "Price must be non-negative"
+
+  - name: "currency_format"
+    field: "currency"
+    type: "regex"
+    pattern: "^[A-Z]{3}$"
+    severity: "error"
+    message: "Currency must be an ISO 4217 code"
+
+  - name: "seller_id_not_null"
+    field: "seller_id"
+    type: "not_null"
+    severity: "error"
+    message: "Seller id is required for listings"

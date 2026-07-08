@@ -1,0 +1,47 @@
+{
+  "type": "record",
+  "name": "Payment",
+  "namespace": "canonical.payment.v1",
+  "doc": "Canonical payment (v1): mandatory attributes are the non-nullable fields",
+  "fields": [
+    {
+      "name": "payment_id",
+      "type": "string",
+      "doc": "Stable unique identifier of the payment (mandatory)"
+    },
+    {
+      "name": "order_id",
+      "type": "string",
+      "doc": "Identifier of the order being paid (mandatory)"
+    },
+    {
+      "name": "amount",
+      "type": "double",
+      "doc": "Payment amount in the payment currency (mandatory)"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "doc": "ISO 4217 currency code, e.g. EUR (mandatory)"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "Payment outcome: authorized/captured/failed/refunded (mandatory)"
+    },
+    {
+      "name": "created_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "When the payment was processed, UTC milliseconds (mandatory)"
+    },
+    {
+      "name": "method",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Payment method, e.g. card/paypal (optional)"
+    }
+  ]
+}
